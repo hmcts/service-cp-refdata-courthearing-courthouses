@@ -16,7 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-class OpenApiControllerTest {
+class CourtHousesControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

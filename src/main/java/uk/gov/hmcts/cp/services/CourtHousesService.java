@@ -5,7 +5,7 @@ import uk.gov.hmcts.cp.openapi.model.CourtHousesschema;
 import uk.gov.hmcts.cp.openapi.model.CourtHousesschemaCourtHouse;
 
 @Service
-public class OpenApiService {
+public class CourtHousesService {
 
     public CourtHousesschema getCourtHouse(String courtId) {
         CourtHousesschema courtHousesschema = new CourtHousesschema();
