@@ -1,7 +1,7 @@
  # renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.1
-
-FROM openjdk:21-jdk-slim
+ARG BASE_IMAGE=21-jdk-slim
+FROM ${BASE_IMAGE}
 
 ENV JAR_FILE_NAME=service-cp-refdata-courthearing-courthouses.jar
 
