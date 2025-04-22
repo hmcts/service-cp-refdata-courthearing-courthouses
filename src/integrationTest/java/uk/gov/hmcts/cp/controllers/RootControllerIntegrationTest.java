@@ -30,7 +30,7 @@ class RootControllerIntegrationTest {
         mockMvc.perform(get("/"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().string(containsString("Welcome to api-cp-springboot-template")));
+            .andExpect(content().string(containsString("Welcome to service-cp-refdata-courthearing-courthouses")));
     }
 
     @DisplayName("Actuator health status should be UP")

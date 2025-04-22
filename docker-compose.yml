@@ -1,7 +1,7 @@
 version: '2.1'
 
 services:
-  api-cp-springboot-template:
+  service-cp-refdata-courthearing-courthouses:
     build:
       context: .
       args:

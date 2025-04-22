@@ -1,9 +1,9 @@
  # renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.1
 
-FROM crmdvrepo01.azurecr.io/registry.hub.docker.com/library/openjdk:21-jdk-slim
+FROM openjdk:21-jdk-slim
 
-ENV JAR_FILE_NAME=api-cp-springboot-template.jar
+ENV JAR_FILE_NAME=service-cp-refdata-courthearing-courthouses.jar
 
 COPY build/libs/$JAR_FILE_NAME /opt/app/
 COPY lib/applicationinsights.json /opt/app/
