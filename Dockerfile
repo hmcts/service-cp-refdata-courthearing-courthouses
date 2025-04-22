@@ -1,8 +1,8 @@
  # renovate: datasource=github-releases depName=microsoft/ApplicationInsights-Java
 ARG APP_INSIGHTS_AGENT_VERSION=3.7.1
 
-ARG FROM_IMAGE
-FROM ${FROM_IMAGE:-crmdvrepo01.azurecr.io/registry.hub.docker.com/library/openjdk:21-jdk-slim}
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE:-crmdvrepo01.azurecr.io/registry.hub.docker.com/library/openjdk:21-jdk-slim}
 
 ENV JAR_FILE_NAME=service-cp-refdata-courthearing-courthouses.jar
 
