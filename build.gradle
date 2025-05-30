@@ -3,7 +3,7 @@ plugins {
   id 'java'
   id 'jacoco'
   id 'io.spring.dependency-management' version '1.1.7'
-  id 'org.springframework.boot' version '3.4.5'
+  id 'org.springframework.boot' version '3.5.0'
   id 'com.github.ben-manes.versions' version '0.52.0'
   id 'org.sonarqube' version '6.2.0.5505'
 
@@ -149,7 +149,7 @@ ext {
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
-  springBootVersion = "3.4.5"
+  springBootVersion = "3.5.0"
 }
 
 ext['snakeyaml.version'] = '2.0'
