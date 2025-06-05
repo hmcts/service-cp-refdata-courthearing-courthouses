@@ -1,34 +1,32 @@
-name: CPP Context Verify & Validation
+name: Build Container
 
-# Need to update this for actual migration
 trigger:
   branches:
     include:
-      - master
-      - main
-      - 'team/*'
-  paths:
-    include:
-      - '*'
+      - !main
+      - !master
 
-pr:
-  - '*'
+pr: none
 
 resources:
   repositories:
     - repository: cppAzureDevOpsTemplates
       type: github
       name: hmcts/cpp-azure-devops-templates
-      endpoint: 'hmcts'
-      ref: 'main'
+      endpoint: 'GitHub-OAuth'
+      ref: 'teams/vp/chakrab/vpbuildpipeline'
+
+variables:
+  - group: hmcts-crime-gh-ado-vg
 
 pool:
   name: "MDV-ADO-AGENT-AKS-01"
   demands:
     - identifier -equals ubuntu-j21
+# pool:
+#   vmImage: 'ubuntu-latest'
 
 stages:
-    - template: pipelines/vp-build.yaml@cppAzureDevOpsTemplates
-      parameters:
-        repo: "$(Build.Repository.Name)"
-
+  - template: pipelines/vp-build.yaml@cppAzureDevOpsTemplates
+    parameters:
+      repo: $(Build.Repository.Name)
