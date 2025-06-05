@@ -10,18 +10,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class OpenAPIConfiguration {
 
+    private OpenAPIConfigurationLoader openAPIConfigLoader = new OpenAPIConfigurationLoader();
+
     @Bean
     public OpenAPI openAPI() {
-        return new OpenAPI()
-            .info(
-                new Info()
-                    .title("rpe demo")
-                    .description("rpe demo")
-                    .version("v0.0.1")
-                    .license(new License().name("MIT").url("https://opensource.org/licenses/MIT")))
-            .externalDocs(
-                new ExternalDocumentation()
-                    .description("README")
-                    .url("https://github.com/hmcts/service-cp-refdata-courthearing-courthouses"));
+        return openAPIConfigLoader.openAPI();
     }
 }

@@ -1,25 +1,29 @@
 package uk.gov.hmcts.cp.services;
 
+import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.cp.openapi.model.CourtHouse;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseCourtRoomInner;
-
-import java.util.List;
+import org.springframework.web.server.ResponseStatusException;
+import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
+import uk.gov.hmcts.cp.repositories.CourtHousesRepository;
 
 @Service
+@RequiredArgsConstructor
 public class CourtHousesService {
+    private static final Logger LOG = LoggerFactory.getLogger(CourtHousesService.class);
+    private final CourtHousesRepository courtHousesRepository;
 
-    public CourtHouse getCourtHouse(String courtId) {
-        CourtHouse courtHouse = new CourtHouse();
-        courtHouse.courtHouseCode(courtId);
-        courtHouse.courtHouseName("House name 221B");
-        courtHouse.courtHouseType(CourtHouse.CourtHouseTypeEnum.CROWN);
-        courtHouse.courtHouseDescription("House name 221B description");
-        CourtHouseCourtRoomInner houseCourtRoom = new CourtHouseCourtRoomInner();
-        houseCourtRoom.courtRoomId(1);
-        houseCourtRoom.courtRoomNumber(1);
-        houseCourtRoom.courtRoomName("Room 1");
-        courtHouse.courtRoom(List.of(houseCourtRoom));
-        return courtHouse;
+    public CourtHouseResponse getCourtHouse(final String courtId) {
+        if (StringUtils.isEmpty(courtId)) {
+            LOG.warn("No court id provided");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "courtId is required");
+        }
+        LOG.warn("NOTE: System configured to return stubbed court house details. Ignoring provided courtId : {}", courtId);
+        final CourtHouseResponse  stubbedcourtHouseResponse = courtHousesRepository.getCourtHouse(courtId);
+        LOG.debug("Court House response: {}", stubbedcourtHouseResponse);
+        return stubbedcourtHouseResponse;
     }
 }
