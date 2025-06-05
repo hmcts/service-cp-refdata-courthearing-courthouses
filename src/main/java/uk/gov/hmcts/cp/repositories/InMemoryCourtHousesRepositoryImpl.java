@@ -12,14 +12,14 @@ import java.util.Arrays;
 public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository {
 
     public CourtHouseResponse getCourtHouse(final String courtId) {
-        CourtHouseResponseCourtRoomInnerVenueContact venueContact = CourtHouseResponseCourtRoomInnerVenueContact.builder()
+        final CourtHouseResponseCourtRoomInnerVenueContact venueContact = CourtHouseResponseCourtRoomInnerVenueContact.builder()
             .venueTelephone("01772 844700")
             .venueEmail("court1@moj.gov.uk")
             .primaryContactName("Name")
             .venueSupport("0330 566 5561")
             .build();
 
-        CourtHouseResponseCourtRoomInnerAddress address = CourtHouseResponseCourtRoomInnerAddress.builder()
+        final CourtHouseResponseCourtRoomInnerAddress address = CourtHouseResponseCourtRoomInnerAddress.builder()
             .address1("Thomas More Building")
             .address2("Royal Courts of Justice")
             .address3("Strand")
@@ -28,14 +28,13 @@ public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository 
             .country("UK")
             .build();
 
-        CourtHouseResponseCourtRoomInner courtRoom = CourtHouseResponseCourtRoomInner.builder()
+        final CourtHouseResponseCourtRoomInner courtRoom = CourtHouseResponseCourtRoomInner.builder()
             .courtRoomNumber(1)
             .courtRoomId(1001)
             .courtRoomName("Courtroom 1")
             .venueContact(venueContact)
             .address(address)
             .build();
-
 
         return CourtHouseResponse.builder()
             .courtHouseType(CourtHouseResponse.CourtHouseTypeEnum.CROWN)
