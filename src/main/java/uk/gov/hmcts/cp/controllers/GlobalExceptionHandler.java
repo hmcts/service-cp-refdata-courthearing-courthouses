@@ -1,6 +1,8 @@
 package uk.gov.hmcts.cp.controllers;
 
 import io.micrometer.tracing.Tracer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -14,6 +16,7 @@ import java.util.Objects;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final Tracer tracer;
 
     public GlobalExceptionHandler(final Tracer tracer) {
@@ -28,6 +31,7 @@ public class GlobalExceptionHandler {
                 .timestamp(OffsetDateTime.now(ZoneOffset.UTC))
                 .traceId(Objects.requireNonNull(tracer.currentSpan()).context().traceId())
                 .build();
+        LOG.atInfo().log("ResponseStatusException occurred: {}", error.getMessage(), exception);
 
         return ResponseEntity
                 .status(exception.getStatusCode())

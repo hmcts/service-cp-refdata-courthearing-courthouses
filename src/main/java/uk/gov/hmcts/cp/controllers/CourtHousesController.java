@@ -23,16 +23,15 @@ public class CourtHousesController implements CourtHouseApi {
 
     @Override
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtId(final String courtId) {
-        String sanitizeCourtId = "";
-        CourtHouseResponse courtHouseResponse = null;
+        final String sanitizeCourtId;
+        final CourtHouseResponse courtHouseResponse;
         try {
             sanitizeCourtId = sanitizeCourtId(courtId);
-            courtHouseResponse = courtHousesService.getCourtHouse(courtId);
+            courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId);
         } catch (ResponseStatusException e) {
-            if (LOG.isErrorEnabled()) {
-                LOG.error(e.getMessage());
-                throw e;
-            }
+            LOG.atError().log(e.getMessage());
+            throw e;
+
         }
         LOG.debug("Found Court House response for caseId: {}", sanitizeCourtId);
         return ResponseEntity.ok()
