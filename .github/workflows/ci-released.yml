@@ -108,3 +108,39 @@ jobs:
           build-args: |
             BASE_IMAGE=openjdk:21-jdk-slim
             JAR_FILENAME=${{ needs.Build.outputs.artefact_name }}.jar
+
+  Deploy:
+    needs: [ Build, Artefact-Version ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger ADO pipeline
+        env:
+          ADO_ORG: 'hmcts-cpp'
+          ADO_PROJECT: 'cpp-apps'
+          PIPELINE_ID: 460 #cp-gh-artifact-to-acr
+          ADO_PAT: ${{ secrets.HMCTS_ADO_PAT }}
+        run: |
+          ARTEFACT_VERSION="${{ needs.Artefact-Version.outputs.RELEASED_VERSION }}"
+          REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          TARGET_REPOSITORY="${GITHUB_REPOSITORY}"
+
+          curl -X POST \
+            -u ":${ADO_PAT}" \
+            -H "Content-Type: application/json" \
+            https://dev.azure.com/${ADO_ORG}/${ADO_PROJECT}/_apis/pipelines/${PIPELINE_ID}/runs?api-version=7.0 \
+            -d "{
+              \"resources\": {
+                \"repositories\": {
+                  \"self\": {
+                    \"refName\": \"refs/heads/main\"
+                  }
+                }
+              },
+              \"templateParameters\": {
+                \"GROUP_ID\": \"uk.gov.hmcts.cp\",
+                \"ARTIFACT_ID\": \"${REPO_NAME}\",
+                \"ARTIFACT_VERSION\": \"${ARTEFACT_VERSION}\",
+                \"TARGET_REPOSITORY\": \"${TARGET_REPOSITORY}\"
+              }
+            }"
