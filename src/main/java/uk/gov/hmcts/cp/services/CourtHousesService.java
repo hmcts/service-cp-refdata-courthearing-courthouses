@@ -18,12 +18,12 @@ public class CourtHousesService {
 
     public CourtHouseResponse getCourtHouse(final String courtId) {
         if (StringUtils.isEmpty(courtId)) {
-            LOG.warn("No court id provided");
+            LOG.atWarn().log("No court id provided");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "courtId is required");
         }
-        LOG.warn("NOTE: System configured to return stubbed court house details. Ignoring provided courtId : {}", courtId);
+        LOG.atWarn().log("NOTE: System configured to return stubbed court house details. Ignoring provided courtId : {}", courtId);
         final CourtHouseResponse  stubbedcourtHouseResponse = courtHousesRepository.getCourtHouse(courtId);
-        LOG.debug("Court House response: {}", stubbedcourtHouseResponse);
+        LOG.atDebug().log("Court House response: {}", stubbedcourtHouseResponse);
         return stubbedcourtHouseResponse;
     }
 }
