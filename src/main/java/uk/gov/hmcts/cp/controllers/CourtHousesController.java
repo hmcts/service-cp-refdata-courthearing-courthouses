@@ -31,7 +31,6 @@ public class CourtHousesController implements CourtHouseApi {
         } catch (ResponseStatusException e) {
             LOG.atError().log(e.getMessage());
             throw e;
-
         }
         LOG.debug("Found Court House response for caseId: {}", sanitizeCourtId);
         return ResponseEntity.ok()

@@ -174,4 +174,3 @@ jobs:
                 \"ARTIFACT_VERSION\": \"${ARTEFACT_VERSION}\"
               }
             }"
-

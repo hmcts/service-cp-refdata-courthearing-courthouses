@@ -15,7 +15,6 @@ import java.util.Objects;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
     private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final Tracer tracer;
 
