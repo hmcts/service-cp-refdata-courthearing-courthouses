@@ -71,8 +71,7 @@ jobs:
         run: |
           VERSION=${{ needs.Artefact-Version.outputs.draft_version }}
 
-          gradle build \
-            -DAPI_SPEC_VERSION=$VERSION
+          gradle build -DAPI_SPEC_VERSION=$VERSION
 
           if [ "${{ github.event_name }}" == "push" ]; then
             echo "Push event trigger - Publishing artefact"
@@ -139,7 +138,6 @@ jobs:
             BASE_IMAGE=openjdk:21-jdk-slim
             JAR_FILENAME=${{ needs.Build.outputs.artefact_name }}.jar
 
-  # https://github.com/marketplace/actions/azure-pipelines-action
   Deploy:
     needs: [ Build, Artefact-Version ]
     runs-on: ubuntu-latest
@@ -155,6 +153,7 @@ jobs:
         run: |
           ARTEFACT_VERSION="${{ needs.Artefact-Version.outputs.draft_version }}"
           REPO_NAME="${GITHUB_REPOSITORY##*/}"
+          TARGET_REPOSITORY="${GITHUB_REPOSITORY}"
 
           curl -X POST \
             -u ":${ADO_PAT}" \
@@ -171,6 +170,7 @@ jobs:
               \"templateParameters\": {
                 \"GROUP_ID\": \"uk.gov.hmcts.cp\",
                 \"ARTIFACT_ID\": \"${REPO_NAME}\",
-                \"ARTIFACT_VERSION\": \"${ARTEFACT_VERSION}\"
+                \"ARTIFACT_VERSION\": \"${ARTEFACT_VERSION}\",
+                \"TARGET_REPOSITORY\": \"${TARGET_REPOSITORY}\"
               }
             }"
