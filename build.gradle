@@ -10,7 +10,7 @@ plugins {
 }
 
 group = 'uk.gov.hmcts.cp'
-version = System.getProperty('API_SPEC_VERSION') ?: '0.0.999'
+version = System.getProperty('ARTEFACT_VERSION') ?: '0.0.999'
 
 def githubActor = project.findProperty("github.actor") ?: System.getenv("GITHUB_ACTOR")
 def githubToken = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
@@ -29,10 +29,9 @@ def azureADOArtifactToken = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
 //    println " - GITHUB_TOKEN=${githubToken != null ? ' ✔ FOUND' : '❌'}"
 //    println " - GITHUB_REPOSITORY=${githubRepo != null ? ' ✔ FOUND' : '❌'}"
 
-//    println "Azure ADO publishing required environment variables:"
-//    println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${azureADOArtifactActor != null ? ' ✔ FOUND' : '❌'}"
-//    println " - AZURE_DEVOPS_ARTIFACT_TOKEN=${azureADOArtifactToken != null ? ' ✔ FOUND' : '❌'}"
-
+//println "Azure ADO publishing required environment variables:"
+//println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${!azureADOArtifactActor || azureADOArtifactActor.isBlank() ? '❌NULL or EMPTY' : ' ✔ FOUND'}"
+//println " - AZURE_DEVOPS_ARTIFACT_USERNAME=${!azureADOArtifactToken || azureADOArtifactToken.isBlank() ? '❌NULL or EMPTY' : ' ✔ FOUND'}"
 
 java {
   sourceCompatibility = JavaVersion.VERSION_21
