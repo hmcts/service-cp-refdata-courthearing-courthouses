@@ -10,7 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseResponseCourtRoomInner;
+import uk.gov.hmcts.cp.openapi.model.CourtRoom;
 import uk.gov.hmcts.cp.repositories.CourtHousesRepository;
 import uk.gov.hmcts.cp.repositories.InMemoryCourtHousesRepositoryImpl;
 import uk.gov.hmcts.cp.services.CourtHousesService;
@@ -49,7 +49,7 @@ class CourtHousesControllerTest {
         assertNotNull(responseBody);
         assertEquals("Central London County Court", responseBody.getCourtHouseName());
         assertEquals("Main Crown Court in London handling major cases", responseBody.getCourtHouseDescription());
-        CourtHouseResponseCourtRoomInner courtRoom = responseBody.getCourtRoom().get(0);
+        CourtRoom courtRoom = responseBody.getCourtRoom().get(0);
         assertNotNull(courtRoom);
         assertEquals("Courtroom 1", courtRoom.getCourtRoomName());
         log.debug("Received CourtHouseResponse: {}", responseBody);

@@ -1,10 +1,10 @@
 package uk.gov.hmcts.cp.repositories;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseResponseCourtRoomInner;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseResponseCourtRoomInnerAddress;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseResponseCourtRoomInnerVenueContact;
+import uk.gov.hmcts.cp.openapi.model.CourtRoom;
+import uk.gov.hmcts.cp.openapi.model.VenueContact;
 
 import java.util.Arrays;
 
@@ -12,14 +12,14 @@ import java.util.Arrays;
 public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository {
 
     public CourtHouseResponse getCourtHouse(final String courtId) {
-        final CourtHouseResponseCourtRoomInnerVenueContact venueContact = CourtHouseResponseCourtRoomInnerVenueContact.builder()
+        final VenueContact venueContact = VenueContact.builder()
             .venueTelephone("01772 844700")
             .venueEmail("court1@moj.gov.uk")
             .primaryContactName("Name")
             .venueSupport("0330 566 5561")
             .build();
 
-        final CourtHouseResponseCourtRoomInnerAddress address = CourtHouseResponseCourtRoomInnerAddress.builder()
+        final Address address = Address.builder()
             .address1("Thomas More Building")
             .address2("Royal Courts of Justice")
             .address3("Strand")
@@ -28,7 +28,7 @@ public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository 
             .country("UK")
             .build();
 
-        final CourtHouseResponseCourtRoomInner courtRoom = CourtHouseResponseCourtRoomInner.builder()
+        final CourtRoom courtRoom = CourtRoom.builder()
             .courtRoomNumber(1)
             .courtRoomId(1001)
             .courtRoomName("Courtroom 1")

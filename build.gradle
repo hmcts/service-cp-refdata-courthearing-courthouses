@@ -230,7 +230,7 @@ application {
 }
 
 ext {
-  apiCourtHousesVersion="0.6.0"
+  apiCourtHousesVersion="0.7.0"
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
