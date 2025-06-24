@@ -32,7 +32,7 @@ import static java.util.Arrays.asList;
         scheme = "https",
         host = "hmcts-dts.pactflow.io",
         providerBranch = "dev/pactTest",
-        authentication = @PactBrokerAuth(token = "eOmnLAeYytphFMQZIj7hUg")
+        authentication = @PactBrokerAuth(token = "<token>")
 )
 public class CourtHousesProviderPactTest {
 
