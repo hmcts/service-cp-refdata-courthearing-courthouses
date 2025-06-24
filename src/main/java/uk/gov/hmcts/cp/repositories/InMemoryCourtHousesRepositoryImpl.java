@@ -1,17 +1,36 @@
 package uk.gov.hmcts.cp.repositories;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.openapi.model.CourtRoom;
+import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.VenueContact;
 
 import java.util.Arrays;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository {
 
+    private final Map<String, CourtHouseResponse> CourtHouseResponseMap = new ConcurrentHashMap<>();
+
+    public void saveCourtHouse(final String courtId, final CourtHouseResponse courtHouseResponse){
+        CourtHouseResponseMap.put(courtId, courtHouseResponse);
+    }
+
     public CourtHouseResponse getCourtHouse(final String courtId) {
+        if (!CourtHouseResponseMap.containsKey(courtId)) {
+            saveCourtHouse(courtId, createCourtHouseResponse());
+        }
+        return CourtHouseResponseMap.get(courtId);
+    }
+
+    public void clearAll(){
+        CourtHouseResponseMap.clear();
+    }
+
+    private CourtHouseResponse createCourtHouseResponse(){
         final VenueContact venueContact = VenueContact.builder()
             .venueTelephone("01772 844700")
             .venueEmail("court1@moj.gov.uk")
