@@ -19,12 +19,12 @@ fi
 export GIT_BRANCH="$BRANCH_NAME"
 
 # Run provider verification with results published
-./gradlew test \
+gradle pactVerificationTest \
   -Dpact.provider.version="$GIT_COMMIT" \
   -Dpact.verifier.publishResults=true \
   -Dpact.provider.branch="$GIT_BRANCH" \
-  -DPACT_BROKER_TOKEN="$PACT_BROKER_TOKEN" \
-  -DPACT_BROKER_HOST="$PACT_BROKER_URL"
+  -Dpact.broker.token="$PACT_BROKER_TOKEN" \
+  -Dpact.broker.url="$PACT_BROKER_URL"
 
 # Optional: tag provider in the broker
 pact-broker create-version-tag \

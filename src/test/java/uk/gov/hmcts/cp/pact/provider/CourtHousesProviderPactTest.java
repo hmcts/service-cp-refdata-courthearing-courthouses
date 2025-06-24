@@ -8,6 +8,7 @@ import au.com.dius.pact.provider.junitsupport.State;
 import au.com.dius.pact.provider.junitsupport.loader.PactBroker;
 import au.com.dius.pact.provider.junitsupport.loader.PactBrokerAuth;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,11 @@ import static java.util.Arrays.asList;
 @ExtendWith({SpringExtension.class, PactVerificationInvocationContextProvider.class})
 @Provider("VPCourtHousePactProvider")
 @PactBroker(
-        scheme = "https",
-        host = "hmcts-dts.pactflow.io",
-        providerBranch = "dev/pactTest"
+    scheme = "https",
+    host = "${pact.broker.host}",
+    authentication = @PactBrokerAuth(token = "${pact.broker.token}")
 )
+@Tag("pact")
 public class CourtHousesProviderPactTest {
 
     @Autowired
