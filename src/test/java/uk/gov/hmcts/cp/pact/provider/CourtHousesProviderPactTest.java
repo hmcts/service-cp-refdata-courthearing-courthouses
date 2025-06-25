@@ -28,7 +28,7 @@ import static java.util.Arrays.asList;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 //@ActiveProfiles("test")  // important: use the in-memory repo!
 @ExtendWith({SpringExtension.class, PactVerificationInvocationContextProvider.class})
-@Provider("VPCourtHousePactProvider")
+@Provider("VPCourtHouseProvider")
 @PactBroker(
     scheme = "https",
     host = "${pact.broker.host}",

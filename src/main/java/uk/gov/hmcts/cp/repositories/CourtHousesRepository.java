@@ -4,7 +4,6 @@ import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 
 @Repository
-//@FunctionalInterface
 public interface CourtHousesRepository {
     CourtHouseResponse getCourtHouse(String courtId);
     void saveCourtHouse(String caseUrn, CourtHouseResponse courtHouseResponse);

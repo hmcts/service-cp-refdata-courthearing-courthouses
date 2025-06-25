@@ -13,21 +13,21 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository {
 
-    private final Map<String, CourtHouseResponse> CourtHouseResponseMap = new ConcurrentHashMap<>();
+    private final Map<String, CourtHouseResponse> courtHouseResponseMap = new ConcurrentHashMap<>();
 
     public void saveCourtHouse(final String courtId, final CourtHouseResponse courtHouseResponse){
-        CourtHouseResponseMap.put(courtId, courtHouseResponse);
+        courtHouseResponseMap.put(courtId, courtHouseResponse);
     }
 
     public CourtHouseResponse getCourtHouse(final String courtId) {
-        if (!CourtHouseResponseMap.containsKey(courtId)) {
+        if (!courtHouseResponseMap.containsKey(courtId)) {
             saveCourtHouse(courtId, createCourtHouseResponse());
         }
-        return CourtHouseResponseMap.get(courtId);
+        return courtHouseResponseMap.get(courtId);
     }
 
     public void clearAll(){
-        CourtHouseResponseMap.clear();
+        courtHouseResponseMap.clear();
     }
 
     private CourtHouseResponse createCourtHouseResponse(){
