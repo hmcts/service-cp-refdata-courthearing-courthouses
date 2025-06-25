@@ -7,6 +7,6 @@ import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 //@FunctionalInterface
 public interface CourtHousesRepository {
     CourtHouseResponse getCourtHouse(String courtId);
-    void saveCourtHouse(final String caseUrn, final CourtHouseResponse courtHouseResponse);
+    void saveCourtHouse(String caseUrn, CourtHouseResponse courtHouseResponse);
     void clearAll();
 }
