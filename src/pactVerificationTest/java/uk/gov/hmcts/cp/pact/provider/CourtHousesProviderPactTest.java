@@ -1,4 +1,4 @@
-package java.uk.gov.hmcts.cp.pact.provider;
+package uk.gov.hmcts.cp.pact.provider;
 
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
