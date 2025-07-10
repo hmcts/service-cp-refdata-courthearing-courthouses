@@ -30,12 +30,13 @@ import static java.util.Arrays.asList;
 @ExtendWith({SpringExtension.class, PactVerificationInvocationContextProvider.class})
 @Provider("CPRefDataCourtHouseProvider")
 @PactBroker(
-    scheme = "https",
-    host = "${pact.broker.host}",
+    url = "${pact.broker.url}",
     authentication = @PactBrokerAuth(token = "${pact.broker.token}")
 )
 @Tag("pact")
 public class CourtHousesProviderPactTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(CourtHousesProviderPactTest.class);
 
     @Autowired
     private CourtHousesRepository courtHousesRepository;
@@ -45,9 +46,9 @@ public class CourtHousesProviderPactTest {
 
     @BeforeEach
     void setupTarget(PactVerificationContext context) {
-        System.out.println("Running test on port: " + port);
+        LOG.atDebug().log("Running test on port: " + port);
         context.setTarget(new HttpTestTarget("localhost", port));
-        System.out.println("pact.verifier.publishResults: " + System.getProperty("pact.verifier.publishResults"));
+        LOG.atDebug().log("pact.verifier.publishResults: " + System.getProperty("pact.verifier.publishResults"));
     }
 
     @State("court house with ID 123 exists")
