@@ -11,19 +11,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
-import uk.gov.hmcts.cp.openapi.model.CourtRoom;
-import uk.gov.hmcts.cp.openapi.model.Address;
-import uk.gov.hmcts.cp.openapi.model.VenueContact;
 import uk.gov.hmcts.cp.pact.helper.JsonFileToObject;
 import uk.gov.hmcts.cp.repositories.CourtHousesRepository;
-
-
-import static java.util.Arrays.asList;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
