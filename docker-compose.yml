@@ -15,6 +15,9 @@ services:
         SERVER_PORT: ${SERVER_PORT}
         JAR_FILENAME: ${JAR_FILENAME}
         JAR_FILE_PATH: ${JAR_FILE_PATH}
+        COURT_HOUSE_CLIENT_URL: ${COURT_HOUSE_CLIENT_URL}
+        CJSCPPUID: ${CJSCPPUID}
+
     environment:
       - SERVER_PORT=${SERVER_PORT:-4550}
     ports:

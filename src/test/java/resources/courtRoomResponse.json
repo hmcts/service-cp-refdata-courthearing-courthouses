@@ -1,0 +1,63 @@
+{
+  "id": "07178fbe-4b93-37d0-99c4-4859ffaa23a2",
+  "oucode": "B42CM00",
+  "lja": "1970",
+  "oucodeL1Code": "B",
+  "courtId": "88",
+  "oucodeL1Name": "Magistrates' Courts",
+  "oucodeL3Name": "Chelmsford Magistrates' Court",
+  "oucodeL3WelshName": "Llys Ynadon Chelmsford",
+  "address1": "10 New Street",
+  "address2": "Chelmsford",
+  "address3": "Essex",
+  "postcode": "CM1 1NT",
+  "defaultStartTime": "10:00:00",
+  "defaultDurationHrs": "07:00:00",
+  "oucodeL2Code": "42",
+  "oucodeL2Name": "Essex",
+  "region": "South East",
+  "courtrooms": [
+    {
+      "id": "a102458c-301f-3fe5-88d0-5cda9455f235",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 644,
+      "courtroomName": "Courtroom 01",
+      "venueId": 118
+    },
+    {
+      "id": "93b03571-0618-35a2-b078-6e0c498487ef",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 645,
+      "courtroomName": "Courtroom 02",
+      "venueId": 118
+    },
+    {
+      "id": "3582560c-f575-368e-9569-078638b1b504",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 646,
+      "courtroomName": "Courtroom 03",
+      "venueId": 118
+    },
+    {
+      "id": "f4435d67-1eec-3f3d-965e-320a65afb901",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 2955,
+      "courtroomName": "Courtroom 04",
+      "venueId": 118
+    },
+    {
+      "id": "94146dc2-ca8b-3ed1-8eb1-45dae4e33e3d",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 2994,
+      "courtroomName": "Courtroom 05",
+      "venueId": 118
+    },
+    {
+      "id": "286e6883-0fdc-3896-a89f-0c46550c6c38",
+      "venueName": "CHELMSFORD MAGISTRATES' COURT",
+      "courtroomId": 3057,
+      "courtroomName": "Courtroom 07",
+      "venueId": 118
+    }
+  ]
+}
