@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cp.repositories;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.openapi.model.CourtRoom;
@@ -10,8 +11,9 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Component
-public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository {
+@Component("inMemoryCourtHousesClientImpl")
+@Profile("pact-test")
+public class InMemoryCourtHousesClientImpl implements CourtHousesClient {
 
     private final Map<String, CourtHouseResponse> courtHouseResponseMap = new ConcurrentHashMap<>();
 
@@ -19,7 +21,7 @@ public class InMemoryCourtHousesRepositoryImpl implements CourtHousesRepository 
         courtHouseResponseMap.put(courtId, courtHouseResponse);
     }
 
-    public CourtHouseResponse getCourtHouse(final String courtId) {
+    public CourtHouseResponse getCourtHouse(final String courtId, final String courtRoomId) {
         if (!courtHouseResponseMap.containsKey(courtId)) {
             saveCourtHouse(courtId, createCourtHouseResponse());
         }

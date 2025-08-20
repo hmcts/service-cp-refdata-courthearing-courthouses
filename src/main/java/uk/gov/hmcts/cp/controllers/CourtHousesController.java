@@ -22,26 +22,28 @@ public class CourtHousesController implements CourtHouseApi {
     }
 
     @Override
-    public ResponseEntity<CourtHouseResponse> getCourthouseByCourtId(final String courtId) {
-        final String sanitizeCourtId;
+    public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final String courtId,
+                                                                                   final String courtRoomId) {
+        final String sanitizeCourtId, sanitizeCourtRoomId;
         final CourtHouseResponse courtHouseResponse;
         try {
             sanitizeCourtId = sanitizeCourtId(courtId);
-            courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId);
+            sanitizeCourtRoomId = sanitizeCourtId(courtRoomId);
+            courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId, sanitizeCourtRoomId);
         } catch (ResponseStatusException e) {
             LOG.atError().log(e.getMessage());
             throw e;
         }
-        LOG.debug("Found Court House response for caseId: {}", sanitizeCourtId);
+        LOG.debug("Found Court House response for courtId: {} and courtRoomId: {} ", sanitizeCourtId, sanitizeCourtRoomId);
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(courtHouseResponse);
     }
 
-    private String sanitizeCourtId(final String courtId) {
-        if (courtId == null) {
+    private String sanitizeCourtId(final String id) {
+        if (id == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "courtId is required");
         }
-        return StringEscapeUtils.escapeHtml4(courtId);
+        return StringEscapeUtils.escapeHtml4(id);
     }
 }

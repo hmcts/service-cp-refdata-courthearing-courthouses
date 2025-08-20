@@ -8,20 +8,21 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CourtHousesRepositoryTest {
+class CourtHousesClientTest {
 
-    private CourtHousesRepository courtHousesRepository;
+    private CourtHousesClient courtHousesClient;
 
     @BeforeEach
     void setUp() {
-        courtHousesRepository = new InMemoryCourtHousesRepositoryImpl();
+        courtHousesClient = new InMemoryCourtHousesClientImpl();
     }
 
     @Test
     void getCourtScheduleByCaseUrn_shouldReturnCourtScheduleResponse() {
         UUID courtId = UUID.randomUUID();
-        CourtHouseResponse response = courtHousesRepository.getCourtHouse(
-            courtId.toString());
+        UUID courtRoomId = UUID.randomUUID();
+        CourtHouseResponse response = courtHousesClient.getCourtHouse(
+            courtId.toString(), courtRoomId.toString());
 
         assertNotNull(response.getCourtHouseCode());
         assertEquals(1, response.getCourtRoom().size());

@@ -16,10 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.pact.helper.JsonFileToObject;
-import uk.gov.hmcts.cp.repositories.CourtHousesRepository;
+import uk.gov.hmcts.cp.repositories.CourtHousesClient;
+import uk.gov.hmcts.cp.repositories.InMemoryCourtHousesClientImpl;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -29,13 +31,14 @@ import uk.gov.hmcts.cp.repositories.CourtHousesRepository;
     url = "${pact.broker.url}",
     authentication = @PactBrokerAuth(token = "${pact.broker.token}")
 )
+@ActiveProfiles("pact-test")
 @Tag("pact")
 public class CourtHousesProviderPactTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(CourtHousesProviderPactTest.class);
 
     @Autowired
-    private CourtHousesRepository courtHousesRepository;
+    private InMemoryCourtHousesClientImpl inMemoryCourtHousesClient;
 
     @LocalServerPort
     private int port;
@@ -49,9 +52,9 @@ public class CourtHousesProviderPactTest {
 
     @State("court house with ID 123 exists")
     public void setupCourtHouse() throws Exception{
-        courtHousesRepository.clearAll();
+        inMemoryCourtHousesClient.clearAll();
         CourtHouseResponse courtHouseResponse =  JsonFileToObject.readJsonFromResources("courtHouse.json", CourtHouseResponse.class);
-        courtHousesRepository.saveCourtHouse("23457", courtHouseResponse);
+        inMemoryCourtHousesClient.saveCourtHouse("23457", courtHouseResponse);
     }
 
     @TestTemplate
