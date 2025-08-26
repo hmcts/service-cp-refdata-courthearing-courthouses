@@ -14,7 +14,6 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component("inMemoryCourtHousesClientImpl")
 @Profile("pact-test")
 public class InMemoryCourtHousesClientImpl implements CourtHousesClient {
-
     private final Map<String, CourtHouseResponse> courtHouseResponseMap = new ConcurrentHashMap<>();
 
     public void saveCourtHouse(final String courtId, final CourtHouseResponse courtHouseResponse){
@@ -50,18 +49,15 @@ public class InMemoryCourtHousesClientImpl implements CourtHousesClient {
             .build();
 
         final CourtRoom courtRoom = CourtRoom.builder()
-            .courtRoomNumber(1)
             .courtRoomId(1001)
             .courtRoomName("Courtroom 1")
-            .venueContact(venueContact)
-            .address(address)
             .build();
 
         return CourtHouseResponse.builder()
             .courtHouseType(CourtHouseResponse.CourtHouseTypeEnum.CROWN)
             .courtHouseCode("LND001")
             .courtHouseName("Central London County Court")
-            .courtHouseDescription("Main Crown Court in London handling major cases")
+            .address(address)
             .courtRoom(Arrays.asList(courtRoom))
             .build();
     }

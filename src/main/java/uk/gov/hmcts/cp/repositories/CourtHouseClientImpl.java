@@ -43,9 +43,9 @@ public class CourtHouseClientImpl implements CourtHousesClient {
         this.httpClient = getHttpClient();
     }
 
-    public CourtHouseClientImpl(HttpClient httpClient,
-                                @Value("${service.court-house-client.url}") String courtHouseClientUrl,
-                                @Value("${service.court-house-client.cjscppuid}") String cjscppuid) {
+    public CourtHouseClientImpl(final HttpClient httpClient,
+                                @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
+                                @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
         this.httpClient = httpClient;
         this.courtHouseClientUrl = courtHouseClientUrl;
         this.cjscppuid = cjscppuid;
@@ -53,7 +53,6 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     public String getCourtHouseClientUrl() {
         LOG.info("courtHouseClientUrl is : {}", this.courtHouseClientUrl);
-        //return "https://steccm64.ingress01.dev.nl.cjscp.org.uk/referencedata-service/query/api/rest/referencedata/organisation-units" ;
         return "https://steccm64.ingress01.dev.nl.cjscp.org.uk/referencedata-service/query/api/rest/referencedata/courtrooms";
     }
 
@@ -63,21 +62,14 @@ public class CourtHouseClientImpl implements CourtHousesClient {
     }
 
     @Override
-    public CourtHouseResponse getCourtHouse(String courtId, String courtRoomId) {
-        CourtResponse courtResponse = getCourtHouseAndRoomDetails(courtId);
+    public CourtHouseResponse getCourtHouse(final String courtId, final String courtRoomId) {
+        final CourtResponse courtResponse = getCourtHouseAndRoomDetails(courtId);
 
-        CourtResponse.CourtRoom cr = courtResponse.getCourtrooms()
+        final CourtResponse.CourtRoom courtroom = courtResponse.getCourtrooms()
             .stream()
             .filter(a -> a.getId().equals(courtRoomId))
             .findFirst()
             .orElse(null);
-
-//        final VenueContact venueContact = VenueContact.builder()
-//            .venueTelephone("01772 844700") //phone
-//            .venueEmail("court1@moj.gov.uk") //email
-//            .primaryContactName("Name")
-//            .venueSupport("0330 566 5561")
-//            .build();
 
         final Address address = Address.builder()
             .address1(courtResponse.getAddress1()) //address1
@@ -89,29 +81,26 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             .build();
 
         final CourtRoom courtRoom = CourtRoom.builder()
-            //.courtRoomNumber(1)
-            .courtRoomId(Integer.valueOf(cr.getCourtroomId())) //courtId
-            .courtRoomName(cr.getCourtroomName())
-            //.venueContact(venueContact)
-            .address(address)
+            .courtRoomId(Integer.valueOf(courtroom.getCourtroomId())) //courtId
+            .courtRoomName(courtroom.getCourtroomName())
             .build();
 
         return CourtHouseResponse.builder()
             .courtHouseType(getCourtHouseType(courtResponse)) //oucodeL1Name
             .courtHouseCode(courtResponse.getOucode()) //oucode
             .courtHouseName(courtResponse.getOucodeL3Name()) //oucodeL3Name
-           // .courtHouseDescription("Main Crown Court in London handling major cases")
+            .address(address)
             .courtRoom(Arrays.asList(courtRoom))
             .build();
     }
 
-    private CourtHouseResponse.CourtHouseTypeEnum getCourtHouseType(CourtResponse courtResponse) {
+    private CourtHouseResponse.CourtHouseTypeEnum getCourtHouseType(final CourtResponse courtResponse) {
         return courtResponse.getOucodeL1Name().contains("Magistrates") ?
             CourtHouseResponse.CourtHouseTypeEnum.MAGISTRATE :
             CourtHouseResponse.CourtHouseTypeEnum.CROWN;
     }
 
-    private CourtResponse getCourtHouseAndRoomDetails(String courtId){
+    private CourtResponse getCourtHouseAndRoomDetails(final String courtId){
         HttpResponse<String> response = null;
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -123,7 +112,7 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() != HttpStatus.OK.value()) {
-                LOG.error("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
+                LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
                 return null;
             }
 
@@ -132,15 +121,15 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                     response.body(),
                     CourtResponse.class
             );
-            LOG.info("Response Code: {}, Response Body: {}", response.statusCode(), response.body());
+            LOG.atInfo().log("Response Code: {}, Response Body: {}", response.statusCode(), response.body());
             return courtResponse;
         } catch (Exception e) {
-            LOG.error("Exception occurred while fetching court room data: {}", e.getMessage());
+            LOG.atError().log("Exception occurred while fetching court room data: {}", e.getMessage());
         }
         return null;
     }
 
-    private String buildUrl(String courtId) {
+    private String buildUrl(final String courtId) {
         return UriComponentsBuilder
                 .fromUri(URI.create(getCourtHouseClientUrl()))
                 .pathSegment(courtId)
