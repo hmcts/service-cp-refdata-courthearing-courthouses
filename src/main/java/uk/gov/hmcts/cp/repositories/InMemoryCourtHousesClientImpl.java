@@ -2,10 +2,9 @@ package uk.gov.hmcts.cp.repositories;
 
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.openapi.model.CourtRoom;
-import uk.gov.hmcts.cp.openapi.model.Address;
-import uk.gov.hmcts.cp.openapi.model.VenueContact;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -32,13 +31,6 @@ public class InMemoryCourtHousesClientImpl implements CourtHousesClient {
     }
 
     private CourtHouseResponse createCourtHouseResponse(){
-        final VenueContact venueContact = VenueContact.builder()
-            .venueTelephone("01772 844700")
-            .venueEmail("court1@moj.gov.uk")
-            .primaryContactName("Name")
-            .venueSupport("0330 566 5561")
-            .build();
-
         final Address address = Address.builder()
             .address1("Thomas More Building")
             .address2("Royal Courts of Justice")

@@ -101,32 +101,30 @@ public class CourtHouseClientImpl implements CourtHousesClient {
     }
 
     private CourtResponse getCourtHouseAndRoomDetails(final String courtId){
-        HttpResponse<String> response = null;
+        CourtResponse courtResponse = null ;
         try {
-            HttpRequest request = HttpRequest.newBuilder()
+            final HttpRequest request = HttpRequest.newBuilder()
                     .uri(new URI(buildUrl(courtId)))
                     .GET()
                     .header("Accept", "application/vnd.referencedata.ou-courtroom+json")
                     .header("CJSCPPUID", getCjscppuid())
                     .build();
 
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != HttpStatus.OK.value()) {
-                LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
-                return null;
-            }
-
-            ObjectMapper objectMapper = new ObjectMapper();
-            CourtResponse courtResponse = objectMapper.readValue(
+            final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == HttpStatus.OK.value()) {
+                final ObjectMapper objectMapper = new ObjectMapper();
+                courtResponse = objectMapper.readValue(
                     response.body(),
                     CourtResponse.class
-            );
-            LOG.atInfo().log("Response Code: {}, Response Body: {}", response.statusCode(), response.body());
-            return courtResponse;
+                );
+                LOG.atInfo().log("Response Code: {}, Response Body: {}", response.statusCode(), response.body());
+            } else {
+                LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
+            }
         } catch (Exception e) {
             LOG.atError().log("Exception occurred while fetching court room data: {}", e.getMessage());
         }
-        return null;
+        return courtResponse;
     }
 
     private String buildUrl(final String courtId) {
