@@ -72,23 +72,23 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             .orElse(null);
 
         final Address address = Address.builder()
-            .address1(courtResponse.getAddress1()) //address1
-            .address2(courtResponse.getAddress2()) //address2
-            .address3(courtResponse.getAddress3()) //address3
-            .address4(courtResponse.getAddress4()) //address4 + address5
-            .postalCode(courtResponse.getPostcode())//postcode
+            .address1(courtResponse.getAddress1())
+            .address2(courtResponse.getAddress2())
+            .address3(courtResponse.getAddress3())
+            .address4(courtResponse.getAddress4())
+            .postalCode(courtResponse.getPostcode())
             .country("UK")
             .build();
 
         final CourtRoom courtRoom = CourtRoom.builder()
-            .courtRoomId(Integer.valueOf(courtroom.getCourtroomId())) //courtId
+            .courtRoomId(Integer.valueOf(courtroom.getCourtroomId()))
             .courtRoomName(courtroom.getCourtroomName())
             .build();
 
         return CourtHouseResponse.builder()
-            .courtHouseType(getCourtHouseType(courtResponse)) //oucodeL1Name
-            .courtHouseCode(courtResponse.getOucode()) //oucode
-            .courtHouseName(courtResponse.getOucodeL3Name()) //oucodeL3Name
+            .courtHouseType(getCourtHouseType(courtResponse))
+            .courtHouseCode(courtResponse.getOucode())
+            .courtHouseName(courtResponse.getOucodeL3Name())
             .address(address)
             .courtRoom(Arrays.asList(courtRoom))
             .build();
