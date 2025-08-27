@@ -26,10 +26,10 @@ class CourtHousesControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @DisplayName("Should /courthouses/{court_id}/courtroom/{court_room_id} request with 200 response code")
+    @DisplayName("Should /courthouses/{court_id}/courtrooms/{court_room_id} request with 200 response code")
     @Test
     void shouldCallActuatorAndGet200() throws Exception {
-        mockMvc.perform(get("/courthouses/123/courtroom/123"))
+        mockMvc.perform(get("/courthouses/123/courtrooms/123"))
             .andDo(print())
             .andExpect(status().isOk());
     }

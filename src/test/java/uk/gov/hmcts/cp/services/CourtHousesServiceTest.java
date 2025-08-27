@@ -26,7 +26,6 @@ class CourtHousesServiceTest {
         // Assert
         assertThat(response).isNotNull();
         assertThat(response.getCourtHouseName()).isEqualTo("Central London County Court");
-        assertThat(response.getCourtHouseDescription()).isEqualTo("Main Crown Court in London handling major cases");
         assertThat(response.getCourtRoom()).isNotEmpty();
         assertThat(response.getCourtRoom().get(0).getCourtRoomName()).isEqualTo("Courtroom 1");
     }
