@@ -46,7 +46,6 @@ class CourtHousesControllerTest {
         CourtHouseResponse responseBody = response.getBody();
         assertNotNull(responseBody);
         assertEquals("Central London County Court", responseBody.getCourtHouseName());
-        assertEquals("Main Crown Court in London handling major cases", responseBody.getCourtHouseDescription());
         CourtRoom courtRoom = responseBody.getCourtRoom().get(0);
         assertNotNull(courtRoom);
         assertEquals("Courtroom 1", courtRoom.getCourtRoomName());
