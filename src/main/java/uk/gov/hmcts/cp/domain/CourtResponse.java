@@ -26,8 +26,6 @@ public class CourtResponse implements Serializable {
     private String address3;
     private String address4;
     private String postcode;
-
-
     private List<CourtRoom> courtrooms;
 
     @JsonIgnoreProperties(ignoreUnknown = true)
