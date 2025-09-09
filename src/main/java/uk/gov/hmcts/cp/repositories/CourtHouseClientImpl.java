@@ -36,6 +36,9 @@ public class CourtHouseClientImpl implements CourtHousesClient {
     @Value("${service.court-house-client.url}")
     private String courtHouseClientUrl;
 
+    @Value("${service.court-house-client.path}")
+    private String courtHouseClientPath;
+
     @Value("${service.court-house-client.cjscppuid}")
     private String cjscppuid;
 
@@ -47,18 +50,23 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                                 @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
                                 @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
         this.httpClient = httpClient;
-        this.courtHouseClientUrl = courtHouseClientUrl;
-        this.cjscppuid = cjscppuid;
+        //this.courtHouseClientUrl = courtHouseClientUrl;
+        //this.cjscppuid = cjscppuid;
     }
 
     public String getCourtHouseClientUrl() {
         LOG.info("courtHouseClientUrl is : {}", this.courtHouseClientUrl);
-        return "https://steccm64.ingress01.dev.nl.cjscp.org.uk/referencedata-service/query/api/rest/referencedata/courtrooms";
+        return this.courtHouseClientUrl;
+    }
+
+    public String getCourtHouseClientPath() {
+        LOG.info("courtHouseClientPath is : {}", this.courtHouseClientPath);
+        return this.courtHouseClientPath;
     }
 
     public String getCjscppuid() {
         LOG.info("cjscppuid is : {}", this.cjscppuid);
-        return "d7c91866-646a-462c-9203-46678e8cddef" ;
+        return this.cjscppuid;
     }
 
     @Override
@@ -130,6 +138,7 @@ public class CourtHouseClientImpl implements CourtHousesClient {
     private String buildUrl(final String courtId) {
         return UriComponentsBuilder
                 .fromUri(URI.create(getCourtHouseClientUrl()))
+                .path(getCourtHouseClientPath())
                 .pathSegment(courtId)
                 .buildAndExpand(courtId)
                 .toUriString();
