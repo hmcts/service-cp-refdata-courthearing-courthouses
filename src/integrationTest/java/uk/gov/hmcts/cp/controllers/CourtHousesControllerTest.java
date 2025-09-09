@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.cp.config.TestConfig;
@@ -21,6 +22,10 @@ import uk.gov.hmcts.cp.config.TestConfig;
 @AutoConfigureMockMvc
 @ActiveProfiles("pact-test")
 @Import(TestConfig.class)
+@TestPropertySource(properties = {
+    "service.court-house-client.url=https://CAOURT_HOUSE.org.uk",
+    "service.court-house-client.cjscppuid=MOCK-CJSCPPUID"
+})
 class CourtHousesControllerTest {
 
     @Autowired

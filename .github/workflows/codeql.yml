@@ -36,7 +36,6 @@ jobs:
           languages: ${{ matrix.language }}
           queries: security-extended
 
-
       - uses: actions/setup-java@v5
         with:
           distribution: 'temurin'

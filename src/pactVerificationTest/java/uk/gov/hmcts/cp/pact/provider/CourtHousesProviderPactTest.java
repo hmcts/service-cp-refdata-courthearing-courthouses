@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.pact.helper.JsonFileToObject;
@@ -31,6 +32,10 @@ import uk.gov.hmcts.cp.repositories.InMemoryCourtHousesClientImpl;
     url = "${pact.broker.url}",
     authentication = @PactBrokerAuth(token = "${pact.broker.token}")
 )
+@TestPropertySource(properties = {
+    "service.court-house-client.url=https://CAOURT_HOUSE.org.uk",
+    "service.court-house-client.cjscppuid=MOCK-CJSCPPUID"
+})
 @ActiveProfiles("pact-test")
 @Tag("pact")
 public class CourtHousesProviderPactTest {
