@@ -8,6 +8,7 @@ plugins {
   id "com.github.ben-manes.versions" version "0.52.0"
   id "org.cyclonedx.bom" version "2.3.1"
   id "au.com.dius.pact" version "4.6.17"
+  id 'pmd'
 }
 
 group = 'uk.gov.hmcts.cp'
@@ -75,7 +76,7 @@ tasks.named('test') {
   // Mockito must be added as an agent, see:
   // https://javadoc.io/doc/org.mockito/mockito-core/latest/org.mockito/org/mockito/Mockito.html#0.3
   jvmArgs += [
-    "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
+          "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains('mockito-core') }}", '-Xshare:off'
   ]
   testLogging {
     events "passed", "skipped", "failed"
@@ -146,8 +147,27 @@ tasks.named('jacocoTestReport') {
 }
 
 tasks.named('check') {
-  dependsOn tasks.named('integration')
+    dependsOn tasks.named('integration')
 }
+
+pmd {
+  ruleSets = []
+  ruleSetFiles = files(".github/pmd-ruleset.xml")
+  ignoreFailures = false
+}
+
+tasks.withType(Pmd) {
+  reports {
+    xml.required.set(true)
+    html.required.set(true)
+  }
+}
+tasks.named("pmdMain").configure {
+    onlyIf { gradle.startParameter.taskNames.contains(name) }
+}
+tasks.named("pmdTest").configure { enabled = false }
+tasks.named("pmdIntegrationTest").configure { enabled = false }
+tasks.named("pmdPactVerificationTest").configure { enabled = false }
 
 // check dependencies upon release ONLY
 tasks.named("dependencyUpdates").configure {
@@ -231,7 +251,7 @@ application {
 }
 
 ext {
-  apiCourtHousesVersion="0.7.3"
+  apiCourtScheduleVersion = "0.4.2"
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
@@ -243,9 +263,10 @@ tasks.named('processPactVerificationTestResources') {
 
 
 dependencies {
-  implementation "uk.gov.hmcts.cp:api-cp-refdata-courthearing-courthouses:$apiCourtHousesVersion"
-  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11'
+  implementation "uk.gov.hmcts.cp:api-cp-crime-schedulingandlisting-courtschedule:$apiCourtScheduleVersion"
+  implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
   implementation 'io.swagger.core.v3:swagger-core:2.2.36'
+  implementation 'javax.xml.bind:jaxb-api:2.3.1'
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
@@ -267,8 +288,9 @@ dependencies {
   implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
   implementation 'org.apache.commons:commons-text:1.14.0'
 
-  implementation 'com.fasterxml.jackson.core:jackson-databind:2.19.2'
-  implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.19.2'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.20.0'
+
+  implementation 'io.jsonwebtoken:jjwt:0.13.0'
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
@@ -293,6 +315,6 @@ dependencies {
   integrationTestImplementation  group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.5.5', {
       exclude group: 'junit', module: 'junit'
       exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-}
+  }
   integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
