@@ -67,7 +67,7 @@ tasks.withType(JavaExec).configureEach {
 }
 
 tasks.named('test') {
-  useJUnitPlatform{
+  useJUnitPlatform {
     excludeTags 'pact'
   }
   systemProperty 'API_SPEC_VERSION', project.version
@@ -124,7 +124,7 @@ tasks.register('pactVerificationTest', Test) {
   systemProperty 'pact.provider.version', sysOrEnv('pact.provider.version')
   systemProperty 'pact.provider.branch', sysOrEnv('pact.provider.branch')
   systemProperty 'pact.verifier.publishResults', sysOrEnv('pact.verifier.publishResults')
-  systemProperty 'pact.env', sysOrEnv( 'pact.env') ?: 'local'
+  systemProperty 'pact.env', sysOrEnv('pact.env') ?: 'local'
   reports {
     junitXml.required.set(true)
     html.required.set(true)
@@ -231,7 +231,7 @@ application {
 }
 
 ext {
-  apiCourtHousesVersion="0.7.3"
+  apiCourtHousesVersion = "0.7.3"
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
@@ -290,9 +290,9 @@ dependencies {
   // especially with platform BOMs, test runtime dependencies, or custom tasks. Explicit dependencies eliminate that risk.
   integrationTestImplementation platform('org.junit:junit-bom:5.13.4')
   integrationTestRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-  integrationTestImplementation  group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.5.5', {
-      exclude group: 'junit', module: 'junit'
-      exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
-}
+  integrationTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.5.5', {
+    exclude group: 'junit', module: 'junit'
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
   integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
