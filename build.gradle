@@ -67,7 +67,7 @@ tasks.withType(JavaExec).configureEach {
 }
 
 tasks.named('test') {
-  useJUnitPlatform{
+  useJUnitPlatform {
     excludeTags 'pact'
   }
   systemProperty 'API_SPEC_VERSION', project.version
@@ -124,7 +124,7 @@ tasks.register('pactVerificationTest', Test) {
   systemProperty 'pact.provider.version', sysOrEnv('pact.provider.version')
   systemProperty 'pact.provider.branch', sysOrEnv('pact.provider.branch')
   systemProperty 'pact.verifier.publishResults', sysOrEnv('pact.verifier.publishResults')
-  systemProperty 'pact.env', sysOrEnv( 'pact.env') ?: 'local'
+  systemProperty 'pact.env', sysOrEnv('pact.env') ?: 'local'
   reports {
     junitXml.required.set(true)
     html.required.set(true)
@@ -231,7 +231,7 @@ application {
 }
 
 ext {
-  apiCourtHousesVersion="0.7.3"
+  apiCourtHousesVersion = "0.7.3"
   log4JVersion = "2.24.3"
   logbackVersion = "1.5.18"
   lombokVersion = "1.18.38"
@@ -259,9 +259,6 @@ dependencies {
   implementation 'com.azure:azure-monitor-opentelemetry-autoconfigure:1.3.0'
 
   implementation 'net.logstash.logback:logstash-logback-encoder:8.1'
-  implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-  implementation group: 'ch.qos.logback', name: 'logback-classic', version: logbackVersion
-  implementation group: 'ch.qos.logback', name: 'logback-core', version: logbackVersion
 
   implementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
   implementation 'org.hibernate.validator:hibernate-validator:9.0.1.Final'
@@ -272,16 +269,27 @@ dependencies {
 
   compileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
   annotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+  testCompileOnly group: 'org.projectlombok', name: 'lombok', version: lombokVersion
+  testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: lombokVersion
 
   testImplementation(platform('org.junit:junit-bom:5.13.4'))
-  testImplementation 'org.mockito:mockito-core:5.19.0'
-  testRuntimeOnly 'org.mockito:mockito-inline:5.2.0'
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
   testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.5.5', {
     exclude group: 'junit', module: 'junit'
     exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
   }
+  testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   testImplementation 'au.com.dius.pact.provider:junit5:4.6.17'
   testImplementation 'au.com.dius.pact.provider:spring6:4.6.17'
+
+  // integrationTestImplementation dependencies are need as they aren't always propagate as expected,
+  // especially with platform BOMs, test runtime dependencies, or custom tasks. Explicit dependencies eliminate that risk.
+  integrationTestImplementation platform('org.junit:junit-bom:5.13.4')
+  integrationTestRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+  integrationTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.5.5', {
+    exclude group: 'junit', module: 'junit'
+    exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+  }
+  integrationTestRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
