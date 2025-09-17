@@ -32,9 +32,9 @@ spring:
 
 service:
   court-house-client:
-    url: ${CP_BACKEND_URL}
+    url: ${CP_BACKEND_URL:}
     path: /referencedata-service/query/api/rest/referencedata/courtrooms
-    cjscppuid: ${CJSCPPUID}
+    cjscppuid: ${CJSCPPUID:}
 
 
 azure:
