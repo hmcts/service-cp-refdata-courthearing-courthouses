@@ -23,7 +23,6 @@ public class CourtHousesService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "courtId and court room id is required");
         }
         LOG.atWarn().log("NOTE: System configured to return stubbed court house details. Ignoring provided courtId: {} and court room id: {}", courtId, courtRoomId);
-        final CourtHouseResponse  stubbedcourtHouseResponse = courtHousesClient.getCourtHouse(courtId, courtRoomId);
-        return stubbedcourtHouseResponse;
+        return courtHousesClient.getCourtHouse(courtId, courtRoomId);
     }
 }

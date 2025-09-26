@@ -1,6 +1,5 @@
 package uk.gov.hmcts.cp.controllers;
 
-import groovy.util.logging.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
@@ -27,7 +26,8 @@ public class CourtHousesController implements CourtHouseApi {
     @Override
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final String courtId,
                                                                                    final String courtRoomId) {
-        final String sanitizeCourtId, sanitizeCourtRoomId;
+        final String sanitizeCourtId;
+        final String sanitizeCourtRoomId;
         final CourtHouseResponse courtHouseResponse;
         try {
             sanitizeCourtId = sanitizeCourtId(courtId);
@@ -45,10 +45,10 @@ public class CourtHousesController implements CourtHouseApi {
             .body(courtHouseResponse);
     }
 
-    private String sanitizeCourtId(final String id) {
-        if (id == null) {
+    private String sanitizeCourtId(final String courtId) {
+        if (courtId == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "courtId is required");
         }
-        return StringEscapeUtils.escapeHtml4(id);
+        return StringEscapeUtils.escapeHtml4(courtId);
     }
 }
