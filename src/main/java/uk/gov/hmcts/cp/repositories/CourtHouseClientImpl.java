@@ -50,22 +50,17 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                                 @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
                                 @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
         this.httpClient = httpClient;
-        //this.courtHouseClientUrl = courtHouseClientUrl;
-        //this.cjscppuid = cjscppuid;
     }
 
     public String getCourtHouseClientUrl() {
-        LOG.info("courtHouseClientUrl is : {}", this.courtHouseClientUrl);
         return this.courtHouseClientUrl;
     }
 
     public String getCourtHouseClientPath() {
-        LOG.info("courtHouseClientPath is : {}", this.courtHouseClientPath);
         return this.courtHouseClientPath;
     }
 
     public String getCjscppuid() {
-        LOG.info("cjscppuid is : {}", this.cjscppuid);
         return this.cjscppuid;
     }
 
