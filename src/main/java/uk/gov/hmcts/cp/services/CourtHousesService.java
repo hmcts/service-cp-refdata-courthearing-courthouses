@@ -24,7 +24,6 @@ public class CourtHousesService {
         }
         LOG.atWarn().log("NOTE: System configured to return stubbed court house details. Ignoring provided courtId: {} and court room id: {}", courtId, courtRoomId);
         final CourtHouseResponse  stubbedcourtHouseResponse = courtHousesClient.getCourtHouse(courtId, courtRoomId);
-        LOG.atDebug().log("Court House response: {}", stubbedcourtHouseResponse);
         return stubbedcourtHouseResponse;
     }
 }

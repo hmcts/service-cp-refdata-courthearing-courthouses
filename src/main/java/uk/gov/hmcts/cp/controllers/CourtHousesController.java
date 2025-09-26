@@ -1,5 +1,7 @@
 package uk.gov.hmcts.cp.controllers;
 
+import groovy.util.logging.Log;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.services.CourtHousesService;
 
 @RestController
+@Slf4j
 public class CourtHousesController implements CourtHouseApi {
     private static final Logger LOG = LoggerFactory.getLogger(CourtHousesController.class);
     private final CourtHousesService courtHousesService;
@@ -28,13 +31,15 @@ public class CourtHousesController implements CourtHouseApi {
         final CourtHouseResponse courtHouseResponse;
         try {
             sanitizeCourtId = sanitizeCourtId(courtId);
+            log.atInfo().log("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
             sanitizeCourtRoomId = sanitizeCourtId(courtRoomId);
             courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId, sanitizeCourtRoomId);
+            log.atInfo().log("courtId is : {} and courtRoomId : {} courtHouseCode is : {} ", courtId, courtRoomId,
+                             courtHouseResponse.getCourtHouseCode());
         } catch (ResponseStatusException e) {
             LOG.atError().log(e.getMessage());
             throw e;
         }
-        LOG.debug("Found Court House response for courtId: {} and courtRoomId: {} ", sanitizeCourtId, sanitizeCourtRoomId);
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(courtHouseResponse);
