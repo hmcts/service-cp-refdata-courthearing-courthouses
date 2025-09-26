@@ -120,7 +120,7 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                     response.body(),
                     CourtResponse.class
                 );
-                LOG.atInfo().log("Response Code: {}, Response Body: {}", response.statusCode(), response.body());
+                LOG.atInfo().log("Response Code: {}", response.statusCode());
             } else {
                 LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
             }
