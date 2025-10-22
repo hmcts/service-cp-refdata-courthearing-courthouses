@@ -6,7 +6,7 @@ plugins {
   id 'jacoco'
   id 'maven-publish'
   id "com.github.ben-manes.versions" version "0.53.0"
-  id "org.cyclonedx.bom" version "2.4.1"
+  id "org.cyclonedx.bom" version "3.0.1"
   id "au.com.dius.pact" version "4.6.17"
 }
 
@@ -245,7 +245,7 @@ tasks.named('processPactVerificationTestResources') {
 dependencies {
   implementation "uk.gov.hmcts.cp:api-cp-refdata-courthearing-courthouses:$apiCourtHousesVersion"
   implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13'
-  implementation 'io.swagger.core.v3:swagger-core:2.2.38'
+  implementation 'io.swagger.core.v3:swagger-core:2.2.39'
 
   implementation 'org.springframework.boot:spring-boot-starter-web'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
