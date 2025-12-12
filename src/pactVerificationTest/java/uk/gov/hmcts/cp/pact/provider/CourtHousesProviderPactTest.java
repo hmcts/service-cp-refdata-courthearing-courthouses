@@ -50,9 +50,9 @@ public class CourtHousesProviderPactTest {
 
     @BeforeEach
     void setupTarget(PactVerificationContext context) {
-        LOG.atDebug().log("Running test on port: " + port);
+        log.debug("Running test on port: " + port);
         context.setTarget(new HttpTestTarget("localhost", port));
-        LOG.atDebug().log("pact.verifier.publishResults: " + System.getProperty("pact.verifier.publishResults"));
+        log.debug("pact.verifier.publishResults: " + System.getProperty("pact.verifier.publishResults"));
     }
 
     @State("court house with ID 123 exists")

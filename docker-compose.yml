@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  service-cp-refdata-courthearing-courthouses:
+  app:
     env_file:
       - .env
     build:

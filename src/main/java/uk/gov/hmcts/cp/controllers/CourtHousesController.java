@@ -31,13 +31,13 @@ public class CourtHousesController implements CourtHouseApi {
         final CourtHouseResponse courtHouseResponse;
         try {
             sanitizeCourtId = sanitizeCourtId(courtId);
-            log.atInfo().log("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
+            log.info("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
             sanitizeCourtRoomId = sanitizeCourtId(courtRoomId);
             courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId, sanitizeCourtRoomId);
-            log.atInfo().log("courtId is : {} and courtRoomId : {} courtHouseCode is : {} ", courtId, courtRoomId,
+            log.info("courtId is : {} and courtRoomId : {} courtHouseCode is : {} ", courtId, courtRoomId,
                              courtHouseResponse.getCourtHouseCode());
         } catch (ResponseStatusException e) {
-            LOG.atError().log(e.getMessage());
+            log.error(e.getMessage());
             throw e;
         }
         return ResponseEntity.ok()
