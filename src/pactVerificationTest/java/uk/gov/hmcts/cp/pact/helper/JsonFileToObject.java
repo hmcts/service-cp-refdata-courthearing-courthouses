@@ -19,7 +19,7 @@ public class JsonFileToObject {
         try {
             file = new File(Objects.requireNonNull(JsonFileToObject.class.getClassLoader().getResource(fileName)).toURI());
         } catch (Exception e) {
-            LOG.atError().log("Error loading file: {}", fileName, e);
+            log.error("Error loading file: {}", fileName, e);
             throw e;
         }
         return mapper.readValue(file, clazz);

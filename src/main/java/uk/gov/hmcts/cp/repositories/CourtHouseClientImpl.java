@@ -2,6 +2,7 @@ package uk.gov.hmcts.cp.repositories;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.util.Arrays;
 
 import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 
+@Slf4j
 @Component
 @Primary
 @RequiredArgsConstructor
@@ -120,12 +122,12 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                     response.body(),
                     CourtResponse.class
                 );
-                LOG.atInfo().log("Response Code: {}", response.statusCode());
+                log.info("Response Code: {}", response.statusCode());
             } else {
-                LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
+                log.info("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
             }
         } catch (Exception e) {
-            LOG.atError().log("Exception occurred while fetching court room data: {}", e.getMessage());
+            log.error("Exception occurred while fetching court room data: {}", e.getMessage());
         }
         return courtResponse;
     }
