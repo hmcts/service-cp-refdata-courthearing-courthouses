@@ -3,8 +3,6 @@ package uk.gov.hmcts.cp.repositories;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpStatus;
@@ -30,7 +28,7 @@ import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 @Primary
 @RequiredArgsConstructor
 public class CourtHouseClientImpl implements CourtHousesClient {
-    private static final Logger LOG = LoggerFactory.getLogger(CourtHouseClientImpl.class);
+
     private final HttpClient httpClient;
 
     @Value("${service.court-house-client.url}")
@@ -44,12 +42,6 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     public CourtHouseClientImpl() throws NoSuchAlgorithmException, KeyManagementException {
         this.httpClient = getHttpClient();
-    }
-
-    public CourtHouseClientImpl(final HttpClient httpClient,
-                                @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
-                                @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
-        this.httpClient = httpClient;
     }
 
     public String getCourtHouseClientUrl() {
