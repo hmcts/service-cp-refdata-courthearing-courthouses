@@ -118,11 +118,13 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             } else {
                 log.info("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
             }
-        } catch (URISyntaxException | IOException | InterruptedException e) {
-            if (e instanceof InterruptedException) {
-                Thread.currentThread().interrupt();
-            }
-            log.error("Exception occurred while fetching court room data: {}", e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Thread interrupted while fetching court room data {}", e.getMessage());
+        } catch (URISyntaxException e) {
+            log.error("Invalid URI while fetching court room data {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("I/O error while fetching court room data {}", e.getMessage());
         }
         return courtResponse;
     }
