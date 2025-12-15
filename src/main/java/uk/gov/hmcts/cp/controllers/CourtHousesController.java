@@ -25,15 +25,13 @@ public class CourtHousesController implements CourtHouseApi {
     @Override
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final String courtId,
                                                                                    final String courtRoomId) {
-        final String sanitizeCourtId;
-        final String sanitizeCourtRoomId;
+        final String sanitizedCourtId = sanitizeCourtId(courtId);
+        final String sanitizedCourtRoomId = sanitizeCourtId(courtRoomId);
         final CourtHouseResponse courtHouseResponse;
         try {
-            sanitizeCourtId = sanitizeCourtId(courtId);
-            log.info("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
-            sanitizeCourtRoomId = sanitizeCourtId(courtRoomId);
-            courtHouseResponse = courtHousesService.getCourtHouse(sanitizeCourtId, sanitizeCourtRoomId);
-            log.info("courtId is : {} and courtRoomId : {} courtHouseCode is : {} ", courtId, courtRoomId,
+            log.info("courtId is : {} and courtRoomId : {} ", sanitizedCourtId, sanitizedCourtRoomId);
+            courtHouseResponse = courtHousesService.getCourtHouse(sanitizedCourtId, sanitizedCourtRoomId);
+            log.info("courtId is : {} and courtRoomId : {} courtHouseCode is : {} ", sanitizedCourtId, sanitizedCourtRoomId,
                              courtHouseResponse.getCourtHouseCode());
         } catch (ResponseStatusException e) {
             log.error(e.getMessage());
