@@ -13,7 +13,9 @@ import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.openapi.model.CourtRoom;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -116,7 +118,10 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             } else {
                 log.info("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
             }
-        } catch (Exception e) {
+        } catch (URISyntaxException | IOException | InterruptedException e) {
+            if (e instanceof InterruptedException) {
+                Thread.currentThread().interrupt();
+            }
             log.error("Exception occurred while fetching court room data: {}", e.getMessage());
         }
         return courtResponse;
