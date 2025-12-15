@@ -16,7 +16,6 @@ import uk.gov.hmcts.cp.services.CourtHousesService;
 @RestController
 @Slf4j
 public class CourtHousesController implements CourtHouseApi {
-    private static final Logger LOG = LoggerFactory.getLogger(CourtHousesController.class);
     private final CourtHousesService courtHousesService;
 
     public CourtHousesController(final CourtHousesService courtHousesService) {

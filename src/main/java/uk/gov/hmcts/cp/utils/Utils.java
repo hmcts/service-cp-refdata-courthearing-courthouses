@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cp.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +17,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
+@Slf4j
 public class Utils {
-    private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
     public static String sanitizeString(final String urn) {
         if (urn == null) {
@@ -30,7 +31,7 @@ public class Utils {
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
             @Override
             public X509Certificate[] getAcceptedIssuers() {
-                return null;
+                return new X509Certificate[0];
             }
 
             @Override
