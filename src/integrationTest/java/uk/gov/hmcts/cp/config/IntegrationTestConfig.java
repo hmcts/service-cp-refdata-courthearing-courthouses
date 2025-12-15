@@ -7,14 +7,14 @@ import uk.gov.hmcts.cp.repositories.InMemoryCourtHousesClientImpl;
 import uk.gov.hmcts.cp.services.CourtHousesService;
 
 @Configuration
-public class TestConfig {
+public class IntegrationTestConfig {
     @Bean("courtHousesService")
     public CourtHousesService courtHousesService() {
         return new CourtHousesService(new InMemoryCourtHousesClientImpl());
     }
 
     @Bean("courtHousesController")
-    public CourtHousesController courtHousesController(CourtHousesService courtHousesService) {
+    public CourtHousesController courtHousesController(final CourtHousesService courtHousesService) {
         return new CourtHousesController(courtHousesService);
     }
 }

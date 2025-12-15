@@ -4,12 +4,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,18 +34,25 @@ class RootControllerIntegrationTest {
     @DisplayName("Should welcome upon root request with 200 response code")
     @Test
     void shouldCallRootAndGet200() throws Exception {
-        mockMvc.perform(get("/"))
+
+        final MvcResult result = mockMvc.perform(get("/"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(content().string(containsString("Welcome to service-cp-refdata-courthearing-courthouses")));
+            .andExpect(content().string(containsString("Welcome to service-cp-refdata-courthearing-courthouses")))
+            .andReturn();
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
     }
 
     @DisplayName("Actuator health status should be UP")
     @Test
     void shouldCallActuatorAndGet200() throws Exception {
-        mockMvc.perform(get("/health"))
+        final MvcResult result = mockMvc.perform(get("/health"))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("UP"));
+            .andExpect(jsonPath("$.status").value("UP"))
+            .andReturn();
+        assertThat(result).isNotNull();
+        assertThat(result.getResponse().getStatus()).isEqualTo(200);
     }
 }

@@ -50,7 +50,6 @@ This document outlines the changes made during the upgrade to Spring Boot v4.0.0
 - **`JWTFilterIntegrationTest`**: Now extends `BaseIntegrationTest`
 - **`SpringLoggingIntegrationTest`**: Moved from `src/test` to `src/integrationTest` and extends `BaseIntegrationTest`
 
-#### Remove all references to Pact
 
 ### 4. Tracing Integration Test Complete Rewrite
 
@@ -92,7 +91,7 @@ The original `TracingIntegrationTest` was failing due to configuration conflicts
 @SpringBootTest
 public class SpringLoggingIntegrationTest {
 
-// After: 
+  // After:
 public class SpringLoggingIntegrationTest extends BaseIntegrationTest {
 ```
 

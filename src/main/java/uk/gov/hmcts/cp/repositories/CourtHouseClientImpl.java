@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -30,7 +29,6 @@ import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 @Component
 @Primary
 @RequiredArgsConstructor
-@Profile("!pact-test")
 public class CourtHouseClientImpl implements CourtHousesClient {
     private static final Logger LOG = LoggerFactory.getLogger(CourtHouseClientImpl.class);
     private final HttpClient httpClient;
