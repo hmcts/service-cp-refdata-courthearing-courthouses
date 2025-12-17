@@ -46,12 +46,6 @@ public class CourtHouseClientImpl implements CourtHousesClient {
         this.httpClient = getHttpClient();
     }
 
-    public CourtHouseClientImpl(final HttpClient httpClient,
-                                @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
-                                @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
-        this.httpClient = httpClient;
-    }
-
     public String getCourtHouseClientUrl() {
         return this.courtHouseClientUrl;
     }
