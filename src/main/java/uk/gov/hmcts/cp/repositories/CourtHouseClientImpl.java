@@ -1,6 +1,7 @@
 package uk.gov.hmcts.cp.repositories;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 @Slf4j
 @Component
 @Primary
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CourtHouseClientImpl implements CourtHousesClient {
 
     private final HttpClient httpClient;
@@ -53,10 +54,12 @@ public class CourtHouseClientImpl implements CourtHousesClient {
     }
 
     public String getCourtHouseClientUrl() {
+        log.info("courtHouseClientUrl {}", this.courtHouseClientUrl);
         return this.courtHouseClientUrl;
     }
 
     public String getCourtHouseClientPath() {
+        log.info("getCourtHouseClientPath {}", this.courtHouseClientPath);
         return this.courtHouseClientPath;
     }
 
@@ -103,16 +106,17 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             CourtHouseResponse.CourtHouseTypeEnum.CROWN;
     }
 
-    private CourtResponse getCourtHouseAndRoomDetails(final String courtId){
-        CourtResponse courtResponse = null ;
+    private CourtResponse getCourtHouseAndRoomDetails(final String courtId) {
+        CourtResponse courtResponse = null;
         try {
+            final URI uri = new URI(buildUrl(courtId));
+            log.info("getCourtHouseAndRoomDetails from {}", uri);
             final HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(buildUrl(courtId)))
-                    .GET()
-                    .header("Accept", "application/vnd.referencedata.ou-courtroom+json")
-                    .header("CJSCPPUID", getCjscppuid())
-                    .build();
-
+                .uri(uri)
+                .GET()
+                .header("Accept", "application/vnd.referencedata.ou-courtroom+json")
+                .header("CJSCPPUID", getCjscppuid())
+                .build();
             final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == HttpStatus.OK.value()) {
                 final ObjectMapper objectMapper = new ObjectMapper();
@@ -137,10 +141,10 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     private String buildUrl(final String courtId) {
         return UriComponentsBuilder
-                .fromUri(URI.create(getCourtHouseClientUrl()))
-                .path(getCourtHouseClientPath())
-                .pathSegment(courtId)
-                .buildAndExpand(courtId)
-                .toUriString();
+            .fromUri(URI.create(getCourtHouseClientUrl()))
+            .path(getCourtHouseClientPath())
+            .pathSegment(courtId)
+            .buildAndExpand(courtId)
+            .toUriString();
     }
 }
