@@ -1,10 +1,12 @@
 package uk.gov.hmcts.cp.integration;
 
+import ch.qos.logback.classic.AsyncAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -31,6 +33,11 @@ public class SpringLoggingIntegrationTest {
         MDC.put("any-mdc-field", "1234-1234");
         ByteArrayOutputStream capturedStdOut = captureStdOut();
         log.info("spring boot test message");
+
+        AsyncAppender asyncAppender = (AsyncAppender) ((ch.qos.logback.classic.Logger) LoggerFactory
+            .getLogger("ROOT"))
+            .getAppender("ASYNC_JSON");
+        asyncAppender.stop();
 
         Map<String, Object> capturedFields = new ObjectMapper().readValue(capturedStdOut.toString(), new TypeReference<>() {
         });
