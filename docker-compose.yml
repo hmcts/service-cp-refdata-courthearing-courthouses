@@ -5,17 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        http_proxy: ${http_proxy}
-        https_proxy: ${https_proxy}
-        no_proxy: ${no_proxy}
-        BASE_IMAGE: ${BASE_IMAGE}
-        SERVER_PORT: ${SERVER_PORT}
-        JAR_FILENAME: ${JAR_FILENAME}
-        JAR_FILE_PATH: ${JAR_FILE_PATH}
-        CP_BACKEND_URL: ${CP_BACKEND_URL}
-        CJSCPPUID: ${CJSCPPUID}
-
     environment:
       - SERVER_PORT=${SERVER_PORT:-4550}
     ports:

@@ -19,11 +19,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-
-import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 
 @Slf4j
 @Component
@@ -41,10 +37,6 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     @Value("${service.court-house-client.cjscppuid}")
     private String cjscppuid;
-
-    public CourtHouseClientImpl() throws NoSuchAlgorithmException, KeyManagementException {
-        this.httpClient = getHttpClient();
-    }
 
     public String getCourtHouseClientUrl() {
         return this.courtHouseClientUrl;
@@ -97,15 +89,17 @@ public class CourtHouseClientImpl implements CourtHousesClient {
             CourtHouseResponse.CourtHouseTypeEnum.CROWN;
     }
 
-    private CourtResponse getCourtHouseAndRoomDetails(final String courtId){
-        CourtResponse courtResponse = null ;
+    private CourtResponse getCourtHouseAndRoomDetails(final String courtId) {
+        String url = buildUrl(courtId);
+        log.info("Getting courtrooms from url:{}", url);
+        CourtResponse courtResponse = null;
         try {
             final HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI(buildUrl(courtId)))
-                    .GET()
-                    .header("Accept", "application/vnd.referencedata.ou-courtroom+json")
-                    .header("CJSCPPUID", getCjscppuid())
-                    .build();
+                .uri(new URI(url))
+                .GET()
+                .header("Accept", "application/vnd.referencedata.ou-courtroom+json")
+                .header("CJSCPPUID", getCjscppuid())
+                .build();
 
             final HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == HttpStatus.OK.value()) {
@@ -131,10 +125,10 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     private String buildUrl(final String courtId) {
         return UriComponentsBuilder
-                .fromUri(URI.create(getCourtHouseClientUrl()))
-                .path(getCourtHouseClientPath())
-                .pathSegment(courtId)
-                .buildAndExpand(courtId)
-                .toUriString();
+            .fromUri(URI.create(getCourtHouseClientUrl()))
+            .path(getCourtHouseClientPath())
+            .pathSegment(courtId)
+            .buildAndExpand(courtId)
+            .toUriString();
     }
 }
