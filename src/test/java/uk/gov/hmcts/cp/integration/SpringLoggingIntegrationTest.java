@@ -47,7 +47,7 @@ public class SpringLoggingIntegrationTest {
         assertThat(capturedFields.get("logger_name")).isEqualTo(this.getClass().getName());
         assertThat(capturedFields.get("thread_name")).isNotNull();
         assertThat(capturedFields.get("level")).isEqualTo("INFO");
-        assertThat(capturedFields.get("message")).isEqualTo("spring boot test message");
+        assertThat(capturedFields.get("message")).isEqualTo("spring boot test message\n");
     }
 
     private ByteArrayOutputStream captureStdOut() {
