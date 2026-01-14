@@ -2,11 +2,9 @@ package uk.gov.hmcts.cp.repositories;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -15,7 +13,9 @@ import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.openapi.model.CourtRoom;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -25,12 +25,12 @@ import java.util.Arrays;
 
 import static uk.gov.hmcts.cp.utils.Utils.getHttpClient;
 
+@Slf4j
 @Component
 @Primary
 @RequiredArgsConstructor
-@Profile("!pact-test")
 public class CourtHouseClientImpl implements CourtHousesClient {
-    private static final Logger LOG = LoggerFactory.getLogger(CourtHouseClientImpl.class);
+
     private final HttpClient httpClient;
 
     @Value("${service.court-house-client.url}")
@@ -44,12 +44,6 @@ public class CourtHouseClientImpl implements CourtHousesClient {
 
     public CourtHouseClientImpl() throws NoSuchAlgorithmException, KeyManagementException {
         this.httpClient = getHttpClient();
-    }
-
-    public CourtHouseClientImpl(final HttpClient httpClient,
-                                @Value("${service.court-house-client.url}") final String courtHouseClientUrl,
-                                @Value("${service.court-house-client.cjscppuid}") final String cjscppuid) {
-        this.httpClient = httpClient;
     }
 
     public String getCourtHouseClientUrl() {
@@ -120,12 +114,17 @@ public class CourtHouseClientImpl implements CourtHousesClient {
                     response.body(),
                     CourtResponse.class
                 );
-                LOG.atInfo().log("Response Code: {}", response.statusCode());
+                log.info("Response Code: {}", response.statusCode());
             } else {
-                LOG.atError().log("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
+                log.info("Failed to fetch OU data. HTTP Status: {}", response.statusCode());
             }
-        } catch (Exception e) {
-            LOG.atError().log("Exception occurred while fetching court room data: {}", e.getMessage());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Thread interrupted while fetching court room data {}", e.getMessage());
+        } catch (URISyntaxException e) {
+            log.error("Invalid URI while fetching court room data {}", e.getMessage());
+        } catch (IOException e) {
+            log.error("I/O error while fetching court room data {}", e.getMessage());
         }
         return courtResponse;
     }

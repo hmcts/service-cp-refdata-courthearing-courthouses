@@ -1,10 +1,13 @@
 package uk.gov.hmcts.cp.integration;
 
+import ch.qos.logback.classic.AsyncAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -12,8 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Slf4j
@@ -27,25 +28,40 @@ public class SpringLoggingIntegrationTest {
     }
 
     @Test
-    void springboot_test_should_log_correct_fields() throws IOException {
+    void springboot_test_should_log_correct_fields_including_exception() throws IOException {
         MDC.put("any-mdc-field", "1234-1234");
         ByteArrayOutputStream capturedStdOut = captureStdOut();
-        log.info("spring boot test message");
+        log.info("spring boot test message", new RuntimeException("MyException"));
+        captureAsyncLogs();
 
-        Map<String, Object> capturedFields = new ObjectMapper().readValue(capturedStdOut.toString(), new TypeReference<>() {
+        String logMessage = capturedStdOut.toString();
+        AssertionsForClassTypes.assertThat(logMessage).isNotEmpty();
+        Map<String, Object> capturedFields = new ObjectMapper().readValue(
+            logMessage, new TypeReference<>() {
         });
+        AssertionsForClassTypes.assertThat(capturedFields.get("any-mdc-field")).isEqualTo("1234-1234");
+        AssertionsForClassTypes.assertThat(capturedFields.get("timestamp")).isNotNull();
+        AssertionsForClassTypes.assertThat(capturedFields.get("logger_name")).isEqualTo(
+            "uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
+        AssertionsForClassTypes.assertThat(capturedFields.get("thread_name")).isEqualTo("Test worker");
+        AssertionsForClassTypes.assertThat(capturedFields.get("level")).isEqualTo("INFO");
+        AssertionsForClassTypes.assertThat(capturedFields.get("message").toString()).contains(
+            "spring boot test message\njava.lang.RuntimeException: MyException");
+        AssertionsForClassTypes.assertThat(capturedFields.get("message").toString()).contains(
+            "at uk.gov.hmcts.cp.integration.SpringLoggingIntegrationTest");
 
-        assertThat(capturedFields.get("any-mdc-field")).isEqualTo("1234-1234");
-        assertThat(capturedFields.get("timestamp")).isNotNull();
-        assertThat(capturedFields.get("logger_name")).isEqualTo(this.getClass().getName());
-        assertThat(capturedFields.get("thread_name")).isNotNull();
-        assertThat(capturedFields.get("level")).isEqualTo("INFO");
-        assertThat(capturedFields.get("message")).isEqualTo("spring boot test message");
     }
 
     private ByteArrayOutputStream captureStdOut() {
         final ByteArrayOutputStream capturedStdOut = new ByteArrayOutputStream();
         System.setOut(new PrintStream(capturedStdOut));
         return capturedStdOut;
+    }
+
+    private void captureAsyncLogs() {
+        AsyncAppender asyncAppender = (AsyncAppender) ((ch.qos.logback.classic.Logger) LoggerFactory
+            .getLogger("ROOT"))
+            .getAppender("ASYNC_JSON");
+        asyncAppender.stop();
     }
 }
