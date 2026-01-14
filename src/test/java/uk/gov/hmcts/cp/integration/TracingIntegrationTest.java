@@ -53,7 +53,7 @@ public class TracingIntegrationTest {
         assertThat(capturedFields.get("traceId")).isNotNull();
         assertThat(capturedFields.get("spanId")).isNotNull();
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.controllers.RootController");
-        assertThat(capturedFields.get("message")).isEqualTo("START");
+        assertThat(capturedFields.get("message")).isEqualTo("START\n");
     }
 
     @Test
