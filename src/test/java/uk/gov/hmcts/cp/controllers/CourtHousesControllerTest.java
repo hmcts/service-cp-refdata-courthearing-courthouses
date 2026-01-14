@@ -1,64 +1,60 @@
 package uk.gov.hmcts.cp.controllers;
 
 
-import org.junit.jupiter.api.BeforeEach;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
-import uk.gov.hmcts.cp.openapi.model.CourtRoom;
-import uk.gov.hmcts.cp.repositories.CourtHousesClient;
-import uk.gov.hmcts.cp.repositories.InMemoryCourtHousesClientImpl;
 import uk.gov.hmcts.cp.services.CourtHousesService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
+@Slf4j
 class CourtHousesControllerTest {
-    private static final Logger log = LoggerFactory.getLogger(CourtHousesControllerTest.class);
 
-    private CourtHousesClient courtHousesClient;
+    @Mock
     private CourtHousesService courtHousesService;
+    @InjectMocks
     private CourtHousesController courtHousesController;
 
-    @BeforeEach
-    void setUp() {
-        courtHousesClient = new InMemoryCourtHousesClientImpl();
-        courtHousesService = new CourtHousesService(courtHousesClient);
-        courtHousesController = new CourtHousesController(courtHousesService);
-    }
+    CourtHouseResponse response = CourtHouseResponse.builder().build();
 
     @Test
     void getCourthouseByCourtId_ShouldReturnResultsWithOkStatus() {
         String courtId = "123";
-        String courtRoomId = "123";
+        String courtRoomId = "456";
+        when(courtHousesService.getCourtHouse(courtId, courtRoomId)).thenReturn(response);
         log.info("Calling courtHousesController.getCourthouseByCourtId with courtId: {}", courtId);
-        ResponseEntity<CourtHouseResponse> response = courtHousesController.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId);
 
-        assertNotNull(response);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
+        ResponseEntity<CourtHouseResponse> responseEntity = courtHousesController.getCourthouseByCourtIdAndCourtRoomId(
+            courtId,
+            courtRoomId
+        );
 
-        CourtHouseResponse responseBody = response.getBody();
-        assertNotNull(responseBody);
-        assertEquals("Central London County Court", responseBody.getCourtHouseName());
-        CourtRoom courtRoom = responseBody.getCourtRoom().get(0);
-        assertNotNull(courtRoom);
-        assertEquals("Courtroom 1", courtRoom.getCourtRoomName());
-        log.debug("Received CourtHouseResponse: {}", responseBody);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertThat(responseEntity.getBody()).isEqualTo(response);
     }
 
     @Test
     void getCourthouseByCourtId_ShouldSanitizeCourtId() {
         String unsanitizedCourtId = "<script>alert('xss')</script>";
         String unsanitizedCourtRoomId = "<script>alert('xss')</script>";
-        log.info("Calling courtHousesController.getCourthouseByCourtId with unsanitized courtId: {}", unsanitizedCourtId);
-
-        ResponseEntity<CourtHouseResponse> response = courtHousesController.getCourthouseByCourtIdAndCourtRoomId(unsanitizedCourtId,unsanitizedCourtRoomId);
+        when(courtHousesService.getCourtHouse("&lt;script&gt;alert('xss')&lt;/script&gt;", "&lt;script&gt;alert('xss')&lt;/script&gt;")).thenReturn(response);
+        ResponseEntity<CourtHouseResponse> response = courtHousesController.getCourthouseByCourtIdAndCourtRoomId(
+            unsanitizedCourtId,
+            unsanitizedCourtRoomId
+        );
         assertNotNull(response);
         log.debug("Received response: {}", response);
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -66,9 +62,11 @@ class CourtHousesControllerTest {
 
     @Test
     void getCourthouseByCourtId_ShouldReturnBadRequestStatus() {
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
-            courtHousesController.getCourthouseByCourtIdAndCourtRoomId(null, null);
-        });
+        ResponseStatusException exception = assertThrows(
+            ResponseStatusException.class, () -> {
+                courtHousesController.getCourthouseByCourtIdAndCourtRoomId(null, null);
+            }
+        );
         assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(exception.getReason()).isEqualTo("courtId is required");
         assertThat(exception.getMessage()).isEqualTo("400 BAD_REQUEST \"courtId is required\"");

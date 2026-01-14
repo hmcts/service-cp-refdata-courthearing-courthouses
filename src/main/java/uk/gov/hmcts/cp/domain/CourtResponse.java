@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -14,9 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class CourtResponse implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class CourtResponse {
     private String id;
     private String oucode;
     private String oucodeL1Name;
@@ -33,11 +30,10 @@ public class CourtResponse implements Serializable {
     @AllArgsConstructor
     @NoArgsConstructor
     @Getter
-    public static class CourtRoom implements Serializable {
+    public static class CourtRoom {
         private String id;
         private String venueName;
         private String courtroomId;
         private String courtroomName;
     }
-
 }
