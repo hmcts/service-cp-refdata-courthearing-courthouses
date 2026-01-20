@@ -50,8 +50,8 @@ dependencies {
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
   // Should come in with the api
-  implementation 'io.swagger.core.v3:swagger-core:2.2.41'
+  implementation 'io.swagger.core.v3:swagger-core:2.2.42'
 
-  testImplementation(platform('org.junit:junit-bom:6.0.1'))
+  testImplementation(platform('org.junit:junit-bom:6.0.2'))
   testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
