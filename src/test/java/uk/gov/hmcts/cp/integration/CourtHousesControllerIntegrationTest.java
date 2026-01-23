@@ -10,10 +10,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.cp.clients.CourtHousesClient;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 import uk.gov.hmcts.cp.domain.CourtResponse;
-import uk.gov.hmcts.cp.clients.CourtHousesClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -62,7 +63,15 @@ class CourtHousesControllerIntegrationTest {
 
     @Test
     void not_exist_should_throw_404() throws Exception {
-        mockRestResponse(HttpStatus.NOT_FOUND, response, courtId);
+        String expectedUrl = expectedUrl(courtId);
+        log.info("Mocking {}", expectedUrl);
+        when(restTemplate.exchange(
+            eq(expectedUrl),
+            eq(HttpMethod.GET),
+            eq(client.getRequestEntity()),
+            eq(CourtResponse.class)
+        )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isNotFound())
@@ -84,12 +93,7 @@ class CourtHousesControllerIntegrationTest {
     }
 
     private void mockRestResponse(HttpStatus httpStatus, CourtResponse courtResponse, String courtRoomId) {
-        String expectedUrl = String.format(
-            "%s%s/%s",
-            appProperties.getBackendUrl(),
-            appProperties.getBackendPath(),
-            courtRoomId
-        );
+        String expectedUrl = expectedUrl(courtRoomId);
         log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
@@ -97,5 +101,14 @@ class CourtHousesControllerIntegrationTest {
             eq(client.getRequestEntity()),
             eq(CourtResponse.class)
         )).thenReturn(new ResponseEntity<>(courtResponse, httpStatus));
+    }
+
+    private String expectedUrl(String courtRoomId) {
+        return String.format(
+            "%s%s/%s",
+            appProperties.getBackendUrl(),
+            appProperties.getBackendPath(),
+            courtRoomId
+        );
     }
 }
