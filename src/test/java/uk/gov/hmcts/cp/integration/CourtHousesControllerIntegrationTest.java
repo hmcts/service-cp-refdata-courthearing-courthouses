@@ -14,9 +14,9 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.clients.CourtHousesClient;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
-import uk.gov.hmcts.cp.domain.CourtResponse;
 
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,18 +43,14 @@ class CourtHousesControllerIntegrationTest {
     @MockitoBean
     RestTemplate restTemplate;
 
-    String courtId = UUID.randomUUID().toString();
-    String courtRoomId = UUID.randomUUID().toString();
+    UUID courtId = UUID.randomUUID();
+    UUID courtRoomId = UUID.fromString("a102458c-301f-3fe5-88d0-5cda9455f235");
     String url = String.format("/courthouses/%s/courtrooms/%s", courtId, courtRoomId);
-    CourtResponse response = CourtResponse.builder()
-        .oucodeL1Name("Magistrates")
-        .address1("address1")
-        .courtrooms(List.of(CourtResponse.CourtRoom.builder().id(courtRoomId).courtroomId("21").build()))
-        .build();
 
     @Test
     void get_courthouses_should_return_ok() throws Exception {
-        mockRestResponse(HttpStatus.OK, response, courtId);
+        String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
+        mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isOk())
@@ -62,16 +58,27 @@ class CourtHousesControllerIntegrationTest {
     }
 
     @Test
-    void not_exist_should_throw_404() throws Exception {
+    void not_exist_thrown_should_throw_404() throws Exception {
         String expectedUrl = expectedUrl(courtId);
         log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
             eq(client.getRequestEntity()),
-            eq(CourtResponse.class)
+            eq(String.class)
         )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
+        mockMvc.perform(get(url))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
+    }
+
+    @Test
+    void not_exist_empty_should_throw_404() throws Exception {
+        String expectedUrl = expectedUrl(courtId);
+        log.info("Mocking {}", expectedUrl);
+        mockRestResponse(HttpStatus.OK, "{}", courtId);
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isNotFound())
@@ -84,7 +91,7 @@ class CourtHousesControllerIntegrationTest {
             anyString(),
             eq(HttpMethod.GET),
             eq(client.getRequestEntity()),
-            eq(CourtResponse.class)
+            eq(String.class)
         )).thenThrow(new RuntimeException("SSL certificate problem: unable to get local issuer certificate"));
         mockMvc.perform(get(url))
             .andDo(print())
@@ -92,18 +99,18 @@ class CourtHousesControllerIntegrationTest {
             .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));
     }
 
-    private void mockRestResponse(HttpStatus httpStatus, CourtResponse courtResponse, String courtRoomId) {
+    private void mockRestResponse(HttpStatus httpStatus, String courtResponse, UUID courtRoomId) {
         String expectedUrl = expectedUrl(courtRoomId);
         log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
             eq(client.getRequestEntity()),
-            eq(CourtResponse.class)
+            eq(String.class)
         )).thenReturn(new ResponseEntity<>(courtResponse, httpStatus));
     }
 
-    private String expectedUrl(String courtRoomId) {
+    private String expectedUrl(UUID courtRoomId) {
         return String.format(
             "%s%s/%s",
             appProperties.getBackendUrl(),

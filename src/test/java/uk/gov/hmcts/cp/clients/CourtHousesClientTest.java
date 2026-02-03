@@ -1,5 +1,6 @@
 package uk.gov.hmcts.cp.clients;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,13 +14,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 import uk.gov.hmcts.cp.domain.CourtResponse;
-import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
+import uk.gov.hmcts.cp.mappers.CourtHouseMapper;
 
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
@@ -31,43 +32,41 @@ class CourtHousesClientTest {
     AppPropertiesBackend appProperties;
     @Mock
     RestTemplate restTemplate;
+    @Mock
+    CourtHouseMapper mapper;
 
     @InjectMocks
     private CourtHousesClient courtHousesClient;
 
-    String courtId = UUID.randomUUID().toString();
-    String courtRoomId = UUID.randomUUID().toString();
+    UUID courtId = UUID.randomUUID();
     String backendRoot = "http://localhost";
     String backendPath = "/referencedata-service/query/api/rest/referencedata/courtrooms";
 
+    @SneakyThrows
     @Test
     void getCourtScheduleByCaseUrn_shouldReturnCourtScheduleResponse() {
         when(appProperties.getBackendUrl()).thenReturn(backendRoot);
         when(appProperties.getBackendPath()).thenReturn(backendPath);
-        mockResponse();
+        String cpResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
+        mockResponse(cpResponse);
+        CourtResponse courtResponse = CourtResponse.builder().build();
+        when(mapper.mapStringToCourtResponse(cpResponse)).thenReturn(courtResponse);
 
-        CourtHouseResponse response = courtHousesClient.getCourtHouse(courtId.toString(), courtRoomId.toString());
+        CourtResponse response = courtHousesClient.getCourtHouse(courtId);
 
-        assertThat(response.getCourtHouseCode()).isEqualTo("oucode");
-        assertEquals(1, response.getCourtRoom().size());
+        assertThat(response).isEqualTo(courtResponse);
     }
 
-    private void mockResponse() {
+    private void mockResponse(String response) {
         String expectedUrl = String.format("%s%s/%s", backendRoot, backendPath, courtId);
         HttpEntity<String> requestEntity = courtHousesClient.getRequestEntity();
-        CourtResponse courtResponse = CourtResponse.builder()
-            .oucode("oucode")
-            .oucodeL1Name("Magistrates")
-            .address1("address1")
-            .courtrooms(List.of(CourtResponse.CourtRoom.builder().id(courtRoomId).courtroomId("21").build()))
-            .build();
-        ResponseEntity<CourtResponse> mockResponse = new ResponseEntity<>(courtResponse, HttpStatus.OK);
+        ResponseEntity<String> mockResponse = new ResponseEntity<>(response, HttpStatus.OK);
         log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
             eq(requestEntity),
-            eq(CourtResponse.class)
+            eq(String.class)
         )).thenReturn(mockResponse);
     }
 }
