@@ -19,7 +19,7 @@ public class CourtHousesService {
     private final CourtHouseMapper courtHouseMapper;
 
     public CourtHouseResponse getCourtHouse(final UUID courtId, final UUID courtRoomId) {
-        CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
+        final CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
         return courtHouseMapper.mapCommonPlatformResponse(courtResponse, courtRoomId);
     }
 }

@@ -19,7 +19,7 @@ public class CourtHouseMapper {
     private final ObjectMapper objectMapper;
 
     @SneakyThrows
-    public CourtResponse mapStringToCourtResponse(String cpResponse) {
+    public CourtResponse mapStringToCourtResponse(final String cpResponse) {
         return objectMapper.readValue(cpResponse, CourtResponse.class);
     }
 

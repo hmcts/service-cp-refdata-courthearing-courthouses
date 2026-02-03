@@ -40,7 +40,8 @@ public class CourtHousesClient {
             requestEntity,
             String.class
         );
-        if (response.getBody().equals("{}")) {
+        final String emptyBody = "{}";
+        if (response.getBody().equals(emptyBody)) {
             log.error("getCourtHouseDetails returned empty response");
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         } else if (response.getStatusCode().is2xxSuccessful()) {

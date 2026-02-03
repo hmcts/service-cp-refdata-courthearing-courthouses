@@ -23,7 +23,7 @@ public class CourtHousesController implements CourtHouseApi {
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final UUID courtId,
                                                                                    final UUID courtRoomId) {
         log.info("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
-        CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouse(courtId, courtRoomId);
+        final CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouse(courtId, courtRoomId);
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(courtHouseResponse);
