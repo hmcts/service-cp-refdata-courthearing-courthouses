@@ -36,7 +36,7 @@ class ValidationIntegrationTest {
     }
 
     @Test
-    void empty_courtId_should_throw_404() throws Exception {
+    void non_uuid_courtId_should_throw_404() throws Exception {
         String url = String.format("/courthouses/%s/courtrooms/%s", "", courtRoomId);
         mockMvc.perform(get(url))
             .andDo(print())
@@ -52,5 +52,4 @@ class ValidationIntegrationTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", containsString("No endpoint GET /courthouses/")));
     }
-
 }
