@@ -5,19 +5,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    environment:
-      - SERVER_PORT=${SERVER_PORT:-4550}
     ports:
-      - "${SERVER_PORT:-4550}:${SERVER_PORT:-4550}"
-    networks:
-      - service-network
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:${SERVER_PORT}/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
+      - "4550:4550"
 
-networks:
-  service-network:
-    name: service-cp-crime-schedulingandlisting-courtschedule-network
