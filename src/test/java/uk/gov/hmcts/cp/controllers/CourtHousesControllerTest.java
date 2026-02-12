@@ -26,17 +26,31 @@ class CourtHousesControllerTest {
     private CourtHousesService courtHousesService;
     @InjectMocks
     private CourtHousesController courtHousesController;
+    @InjectMocks
+    private CourtRoomsController courtRoomsController;
 
     UUID courtId = UUID.fromString("cfd36d18-4e36-4581-91a7-356539a2eb4d");
     UUID courtRoomId = UUID.fromString("71573215-31eb-47ca-b9b4-dadf314a5e21");
     CourtHouseResponse response = CourtHouseResponse.builder().build();
 
     @Test
-    void getCourthouseByCourtId_ShouldReturnResultsWithOkStatus() {
-        when(courtHousesService.getCourtHouse(courtId, courtRoomId)).thenReturn(response);
+    void getCourthouseByCourtIdShouldReturnResultsWithOkStatus() {
+        when(courtHousesService.getCourtHouseByCourtId(courtId)).thenReturn(response);
         log.info("Calling courtHousesController.getCourthouseByCourtId with courtId: {}", courtId);
 
-        ResponseEntity<CourtHouseResponse> responseEntity = courtHousesController.getCourthouseByCourtIdAndCourtRoomId(
+        ResponseEntity<CourtHouseResponse> responseEntity = courtHousesController.getCourthouseByCourtId(courtId);
+
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertThat(responseEntity.getBody()).isEqualTo(response);
+    }
+
+    @Test
+    void getCourthouseByCourtIdAndCourtRoomIdShouldReturnResultsWithOkStatus() {
+        when(courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId)).thenReturn(response);
+        log.info("Calling courtHousesController.getCourthouseByCourtIdAndCourtRoomId with courtId: {}, courtRoomId: {}",
+            courtId, courtRoomId);
+
+        ResponseEntity<CourtHouseResponse> responseEntity = courtRoomsController.getCourthouseByCourtIdAndCourtRoomId(
             courtId,
             courtRoomId
         );

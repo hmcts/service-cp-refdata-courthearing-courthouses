@@ -46,6 +46,17 @@ class CourtHousesControllerIntegrationTest {
     UUID courtId = UUID.randomUUID();
     UUID courtRoomId = UUID.fromString("a102458c-301f-3fe5-88d0-5cda9455f235");
     String url = String.format("/courthouses/%s/courtrooms/%s", courtId, courtRoomId);
+    String courthouseOnlyUrl = String.format("/courthouses/%s", courtId);
+
+    @Test
+    void getCourthouseByCourtIdShouldReturnOk() throws Exception {
+        String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
+        mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
+        mockMvc.perform(get(courthouseOnlyUrl))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"));
+    }
 
     @Test
     void get_courthouses_should_return_ok() throws Exception {

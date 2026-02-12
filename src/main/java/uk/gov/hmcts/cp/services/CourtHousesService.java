@@ -18,8 +18,13 @@ public class CourtHousesService {
     private final CourtHousesClient courtHousesClient;
     private final CourtHouseMapper courtHouseMapper;
 
-    public CourtHouseResponse getCourtHouse(final UUID courtId, final UUID courtRoomId) {
+    public CourtHouseResponse getCourthouseByCourtIdAndCourtRoomId(final UUID courtId, final UUID courtRoomId) {
         CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
-        return courtHouseMapper.mapCommonPlatformResponse(courtResponse, courtRoomId);
+        return courtHouseMapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId);
+    }
+
+    public CourtHouseResponse getCourtHouseByCourtId(final UUID courtId) {
+        CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
+        return courtHouseMapper.mapCPResponseToCourtHouse(courtResponse);
     }
 }

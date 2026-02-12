@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
 import uk.gov.hmcts.cp.openapi.api.CourtHouseApi;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.services.CourtHousesService;
@@ -20,12 +21,11 @@ public class CourtHousesController implements CourtHouseApi {
     }
 
     @Override
-    public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final UUID courtId,
-                                                                                   final UUID courtRoomId) {
-        log.info("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
-        CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouse(courtId, courtRoomId);
+    public ResponseEntity<CourtHouseResponse> getCourthouseByCourtId(final UUID courtId) {
+        log.info("courtId is : {}", courtId);
+        CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouseByCourtId(courtId);
         return ResponseEntity.ok()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(courtHouseResponse);
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(courtHouseResponse);
     }
 }
