@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -64,7 +65,11 @@ class CourtHousesControllerIntegrationTest {
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.courtHouseType").value("magistrate"));
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
+            .andExpect(jsonPath("$.courtRoom").exists())
+            .andExpect(jsonPath("$.courtRoom").value(hasSize(1)))
+            .andExpect(jsonPath("$.courtRoom[0].courtRoomId").value(644))
+            .andExpect(jsonPath("$.courtRoom[0].courtRoomName").value("Courtroom 01"));
     }
 
     @Test
