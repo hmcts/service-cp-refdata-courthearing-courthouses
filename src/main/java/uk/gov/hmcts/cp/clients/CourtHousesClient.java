@@ -22,6 +22,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CourtHousesClient {
 
+    private static final String EMPTY_JSON_OBJECT = "{}";
+
     private final AppPropertiesBackend appProperties;
     private final RestTemplate restTemplate;
     private final CourtHouseMapper mapper;
@@ -40,7 +42,7 @@ public class CourtHousesClient {
             requestEntity,
             String.class
         );
-        if (response.getBody().equals("{}")) {
+        if (EMPTY_JSON_OBJECT.equals(response.getBody())) {
             log.error("getCourtHouseDetails returned empty response");
             throw new HttpClientErrorException(HttpStatus.NOT_FOUND);
         } else if (response.getStatusCode().is2xxSuccessful()) {

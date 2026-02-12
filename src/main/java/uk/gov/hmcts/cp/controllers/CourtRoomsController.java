@@ -1,6 +1,5 @@
 package uk.gov.hmcts.cp.controllers;
 
-import uk.gov.hmcts.cp.openapi.api.CourtHouseApi;
 import uk.gov.hmcts.cp.openapi.api.CourtRoomApi;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 import uk.gov.hmcts.cp.services.CourtHousesService;
@@ -25,7 +24,7 @@ public class CourtRoomsController implements CourtRoomApi {
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtIdAndCourtRoomId(final UUID courtId,
                                                                                    final UUID courtRoomId) {
         log.info("courtId is : {} and courtRoomId : {} ", courtId, courtRoomId);
-        CourtHouseResponse courtHouseResponse = courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId);
+        final CourtHouseResponse courtHouseResponse = courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId);
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_JSON)
             .body(courtHouseResponse);

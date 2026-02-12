@@ -23,7 +23,7 @@ public class CourtHousesController implements CourtHouseApi {
     @Override
     public ResponseEntity<CourtHouseResponse> getCourthouseByCourtId(final UUID courtId) {
         log.info("courtId is : {}", courtId);
-        CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouseByCourtId(courtId);
+        final CourtHouseResponse courtHouseResponse = courtHousesService.getCourtHouseByCourtId(courtId);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(courtHouseResponse);

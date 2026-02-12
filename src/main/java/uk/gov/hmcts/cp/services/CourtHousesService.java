@@ -19,12 +19,12 @@ public class CourtHousesService {
     private final CourtHouseMapper courtHouseMapper;
 
     public CourtHouseResponse getCourthouseByCourtIdAndCourtRoomId(final UUID courtId, final UUID courtRoomId) {
-        CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
+        final CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
         return courtHouseMapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId);
     }
 
     public CourtHouseResponse getCourtHouseByCourtId(final UUID courtId) {
-        CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
+        final CourtResponse courtResponse = courtHousesClient.getCourtHouse(courtId);
         return courtHouseMapper.mapCPResponseToCourtHouse(courtResponse);
     }
 }

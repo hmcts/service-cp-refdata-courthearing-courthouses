@@ -24,19 +24,19 @@ public class CourtHouseMapper {
     private final ObjectMapper objectMapper;
 
     @SneakyThrows
-    public CourtResponse mapStringToCourtResponse(String cpResponse) {
+    public CourtResponse mapStringToCourtResponse(final String cpResponse) {
         return objectMapper.readValue(cpResponse, CourtResponse.class);
     }
 
     public CourtHouseResponse mapCourtHouseCPResponseWithCourtRoomId(final CourtResponse cpCourtResponse,
                                                                      final UUID courtRoomId) {
-        List<CourtRoom> courtRooms = Optional.ofNullable(cpCourtResponse.getCourtrooms())
+        final List<CourtRoom> courtRooms = Optional.ofNullable(cpCourtResponse.getCourtrooms())
             .orElse(Collections.emptyList())
             .stream()
             .filter(cr -> cr.getId().equals(courtRoomId.toString()))
             .findFirst()
             .stream()
-            .map(cr -> mapCpCourtRoomToCourtRoom(cr))
+            .<CourtRoom>map(this::mapCpCourtRoomToCourtRoom)
             .collect(Collectors.toList());
 
         return buildCourtHouseResponse(cpCourtResponse, courtRooms);
