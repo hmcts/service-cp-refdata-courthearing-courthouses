@@ -43,13 +43,7 @@ public class CourtHouseMapper {
     }
 
     public CourtHouseResponse mapCPResponseToCourtHouse(final CourtResponse cpCourtResponse) {
-        List<CourtRoom> courtRooms = Optional.ofNullable(cpCourtResponse.getCourtrooms())
-            .orElse(Collections.emptyList())
-            .stream()
-            .map(cr -> mapCpCourtRoomToCourtRoom(cr))
-            .collect(Collectors.toList());
-
-        return buildCourtHouseResponse(cpCourtResponse, courtRooms);
+        return buildCourtHouseResponse(cpCourtResponse, Collections.emptyList());
     }
 
     private CourtHouseResponse buildCourtHouseResponse(final CourtResponse cpCourtResponse,
