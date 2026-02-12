@@ -43,7 +43,7 @@ public class CourtHouseMapper {
     }
 
     public CourtHouseResponse mapCPResponseToCourtHouse(final CourtResponse cpCourtResponse) {
-        return buildCourtHouseResponse(cpCourtResponse, Collections.emptyList());
+        return buildCourtHouseResponseWithoutCourtRoom(cpCourtResponse);
     }
 
     private CourtHouseResponse buildCourtHouseResponse(final CourtResponse cpCourtResponse,
@@ -54,6 +54,16 @@ public class CourtHouseMapper {
             .courtHouseName(cpCourtResponse.getOucodeL3Name())
             .address(buildAddress(cpCourtResponse))
             .courtRoom(courtRooms)
+            .build();
+    }
+
+    private CourtHouseResponse buildCourtHouseResponseWithoutCourtRoom(final CourtResponse cpCourtResponse) {
+        return CourtHouseResponse.builder()
+            .courtHouseType(getCourtHouseType(cpCourtResponse))
+            .courtHouseCode(cpCourtResponse.getOucode())
+            .courtHouseName(cpCourtResponse.getOucodeL3Name())
+            .address(buildAddress(cpCourtResponse))
+            .courtRoom(null)
             .build();
     }
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.cp.controllers;
 
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@Slf4j
 class CourtHousesControllerTest {
 
     @Mock
@@ -36,7 +34,6 @@ class CourtHousesControllerTest {
     @Test
     void getCourthouseByCourtIdShouldReturnResultsWithOkStatus() {
         when(courtHousesService.getCourtHouseByCourtId(courtId)).thenReturn(response);
-        log.info("Calling courtHousesController.getCourthouseByCourtId with courtId: {}", courtId);
 
         ResponseEntity<CourtHouseResponse> responseEntity = courtHousesController.getCourthouseByCourtId(courtId);
 
@@ -45,10 +42,8 @@ class CourtHousesControllerTest {
     }
 
     @Test
-    void getCourthouseByCourtIdAndCourtRoomIdShouldReturnResultsWithOkStatus() {
+    void get_courthouse_by_court_id_and_court_room_id_should_return_results_with_ok_status() {
         when(courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId)).thenReturn(response);
-        log.info("Calling courtHousesController.getCourthouseByCourtIdAndCourtRoomId with courtId: {}, courtRoomId: {}",
-            courtId, courtRoomId);
 
         ResponseEntity<CourtHouseResponse> responseEntity = courtRoomsController.getCourthouseByCourtIdAndCourtRoomId(
             courtId,

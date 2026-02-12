@@ -1,6 +1,5 @@
 package uk.gov.hmcts.cp.integration;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +28,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Slf4j
 class CourtHousesControllerIntegrationTest {
 
     @Autowired
@@ -49,13 +47,14 @@ class CourtHousesControllerIntegrationTest {
     String courthouseOnlyUrl = String.format("/courthouses/%s", courtId);
 
     @Test
-    void getCourthouseByCourtIdShouldReturnOk() throws Exception {
-        String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
+    void get_courthouse_by_court_id_should_return_ok() throws Exception {
+        String jsonResponse = Files.readString(Path.of("src/test/resources/courtHouseResponse.json"));
         mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
         mockMvc.perform(get(courthouseOnlyUrl))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.courtHouseType").value("magistrate"));
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
+            .andExpect(jsonPath("$.courtRoom").doesNotExist());
     }
 
     @Test
@@ -71,7 +70,6 @@ class CourtHousesControllerIntegrationTest {
     @Test
     void not_exist_thrown_should_throw_404() throws Exception {
         String expectedUrl = expectedUrl(courtId);
-        log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
@@ -87,8 +85,6 @@ class CourtHousesControllerIntegrationTest {
 
     @Test
     void not_exist_empty_should_throw_404() throws Exception {
-        String expectedUrl = expectedUrl(courtId);
-        log.info("Mocking {}", expectedUrl);
         mockRestResponse(HttpStatus.OK, "{}", courtId);
         mockMvc.perform(get(url))
             .andDo(print())
@@ -112,7 +108,6 @@ class CourtHousesControllerIntegrationTest {
 
     private void mockRestResponse(HttpStatus httpStatus, String courtResponse, UUID courtRoomId) {
         String expectedUrl = expectedUrl(courtRoomId);
-        log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
