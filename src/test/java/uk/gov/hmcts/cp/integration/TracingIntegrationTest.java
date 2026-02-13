@@ -18,7 +18,6 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
@@ -51,7 +50,9 @@ public class TracingIntegrationTest {
 
         String loggedMessage = capturedStdOut.toString();
         assertThat(loggedMessage).isNotEmpty();
-        Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
+        String firstJsonLine = loggedMessage.lines().filter(l -> l.trim().startsWith("{")).findFirst()
+                .orElseThrow(() -> new AssertionError("No JSON log line in: " + loggedMessage));
+        Map<String, Object> capturedFields = new ObjectMapper().readValue(firstJsonLine, new TypeReference<>() {
         });
         assertThat(capturedFields.get(TRACE_ID)).isNotNull();
         assertThat(capturedFields.get(SPAN_ID)).isNotNull();
@@ -66,12 +67,13 @@ public class TracingIntegrationTest {
                         .header(TRACE_ID, "1234-1234")
                         .header(SPAN_ID, "567-567"))
                 .andExpect(status().isOk())
-                .andDo(print())
                 .andReturn();
 
         String loggedMessage = capturedStdOut.toString();
         assertThat(loggedMessage).isNotEmpty();
-        Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
+        String firstJsonLine = loggedMessage.lines().filter(l -> l.trim().startsWith("{")).findFirst()
+                .orElseThrow(() -> new AssertionError("No JSON log line in: " + loggedMessage));
+        Map<String, Object> capturedFields = new ObjectMapper().readValue(firstJsonLine, new TypeReference<>() {
         });
         assertThat(capturedFields.get(TRACE_ID)).isEqualTo("1234-1234");
         assertThat(capturedFields.get(SPAN_ID)).isEqualTo("567-567");

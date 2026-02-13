@@ -1,0 +1,6 @@
+# TODO - Disable OTLP metrics export in tests/CI (no receiver on localhost:4318)
+management:
+  otlp:
+    metrics:
+      export:
+        enabled: false
