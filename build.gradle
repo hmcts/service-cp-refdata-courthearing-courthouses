@@ -39,9 +39,9 @@ springBoot {
 }
 
 dependencies {
-  implementation "uk.gov.hmcts.cp:api-cp-refdata-courthearing-courthouses:1.0.7"
+  implementation "uk.gov.hmcts.cp:api-cp-refdata-courthearing-courthouses:1.0.8"
 
-  // --- Observability / Actuator / OTEL / Prometheus ---
+  // --- Observability / Actuator / OTEL / Prometheus ---x
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.hibernate.validator:hibernate-validator'
   implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
