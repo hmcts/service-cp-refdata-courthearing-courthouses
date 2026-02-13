@@ -5,12 +5,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 import uk.gov.hmcts.cp.clients.CourtHousesClient;
+import uk.gov.hmcts.cp.domain.CourtResponse;
+import uk.gov.hmcts.cp.mappers.CourtHouseMapper;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -18,43 +20,24 @@ class CourtHousesServiceTest {
 
     @Mock
     private CourtHousesClient courtHousesClient;
+    @Mock
+    private CourtHouseMapper mapper;
 
     @InjectMocks
     private CourtHousesService courtHousesService;
 
+    CourtResponse courtResponse = CourtResponse.builder().build();
+    UUID courtId = UUID.fromString("494d4085-4317-4153-b5a5-2d8918900275");
+    UUID courtRoomId = UUID.fromString("2edc5ba7-1832-4f65-ae01-7f712c2e6ecd");
     CourtHouseResponse courtHouseResponse = CourtHouseResponse.builder().build();
 
     @Test
     void service_should_call_client() {
-        String validCourtId = "123";
-        String validCourtRoomId = "123";
-        when(courtHousesClient.getCourtHouse(validCourtId, validCourtRoomId)).thenReturn(courtHouseResponse);
+        when(courtHousesClient.getCourtHouse(courtId)).thenReturn(courtResponse);
+        when(mapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId)).thenReturn(courtHouseResponse);
 
-        CourtHouseResponse response = courtHousesService.getCourtHouse(validCourtId, validCourtRoomId);
+        CourtHouseResponse response = courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId);
 
         assertThat(response).isEqualTo(courtHouseResponse);
-    }
-
-    @Test
-    void service_should_bad_request_when_null_courtId() {
-        String nullCourtId = null;
-
-        assertThatThrownBy(() -> courtHousesService.getCourtHouse(nullCourtId, null))
-            .isInstanceOf(ResponseStatusException.class)
-            .hasMessageContaining("400 BAD_REQUEST")
-            .hasMessageContaining("courtId and court room id is required");
-    }
-
-    @Test
-    void service_should_bad_request_when_empty_courtId() {
-        // Arrange
-        String emptyCourtId = "";
-        String emptyCourtRoomId = "";
-
-        // Act & Assert
-        assertThatThrownBy(() -> courtHousesService.getCourtHouse(emptyCourtId, emptyCourtRoomId))
-            .isInstanceOf(ResponseStatusException.class)
-            .hasMessageContaining("400 BAD_REQUEST")
-            .hasMessageContaining("courtId and court room id is required");
     }
 }
