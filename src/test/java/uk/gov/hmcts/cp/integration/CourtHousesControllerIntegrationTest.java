@@ -1,6 +1,5 @@
 package uk.gov.hmcts.cp.integration;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,12 +23,12 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@Slf4j
 class CourtHousesControllerIntegrationTest {
 
     @Autowired
@@ -46,6 +45,18 @@ class CourtHousesControllerIntegrationTest {
     UUID courtId = UUID.randomUUID();
     UUID courtRoomId = UUID.fromString("a102458c-301f-3fe5-88d0-5cda9455f235");
     String url = String.format("/courthouses/%s/courtrooms/%s", courtId, courtRoomId);
+    String courthouseOnlyUrl = String.format("/courthouses/%s", courtId);
+
+    @Test
+    void get_courthouse_by_court_id_should_return_ok() throws Exception {
+        String jsonResponse = Files.readString(Path.of("src/test/resources/courtHouseResponse.json"));
+        mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
+        mockMvc.perform(get(courthouseOnlyUrl))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
+            .andExpect(jsonPath("$.courtRoom").doesNotExist());
+    }
 
     @Test
     void get_courthouses_should_return_ok() throws Exception {
@@ -54,13 +65,16 @@ class CourtHousesControllerIntegrationTest {
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.courtHouseType").value("magistrate"));
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
+            .andExpect(jsonPath("$.courtRoom").exists())
+            .andExpect(jsonPath("$.courtRoom").value(hasSize(1)))
+            .andExpect(jsonPath("$.courtRoom[0].courtRoomId").value(644))
+            .andExpect(jsonPath("$.courtRoom[0].courtRoomName").value("Courtroom 01"));
     }
 
     @Test
     void not_exist_thrown_should_throw_404() throws Exception {
         String expectedUrl = expectedUrl(courtId);
-        log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),
@@ -76,8 +90,6 @@ class CourtHousesControllerIntegrationTest {
 
     @Test
     void not_exist_empty_should_throw_404() throws Exception {
-        String expectedUrl = expectedUrl(courtId);
-        log.info("Mocking {}", expectedUrl);
         mockRestResponse(HttpStatus.OK, "{}", courtId);
         mockMvc.perform(get(url))
             .andDo(print())
@@ -101,7 +113,6 @@ class CourtHousesControllerIntegrationTest {
 
     private void mockRestResponse(HttpStatus httpStatus, String courtResponse, UUID courtRoomId) {
         String expectedUrl = expectedUrl(courtRoomId);
-        log.info("Mocking {}", expectedUrl);
         when(restTemplate.exchange(
             eq(expectedUrl),
             eq(HttpMethod.GET),

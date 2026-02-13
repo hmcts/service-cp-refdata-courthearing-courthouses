@@ -55,7 +55,7 @@ class CourtHouseMapperTest {
             .courtrooms(List.of(courtRoom))
             .build();
 
-        CourtHouseResponse response = courtHouseMapper.mapCommonPlatformResponse(courtResponse, courtRoomId);
+        CourtHouseResponse response = courtHouseMapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId);
 
         assertResponse(response);
     }
