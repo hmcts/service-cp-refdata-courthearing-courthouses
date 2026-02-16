@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import uk.gov.hmcts.cp.domain.CourtResponse;
 import uk.gov.hmcts.cp.openapi.model.Address;
 import uk.gov.hmcts.cp.openapi.model.CourtHouseResponse;
@@ -28,7 +29,7 @@ class CourtHouseMapperTest {
 
     @SneakyThrows
     @Test
-    void cp_response_string_should_map_to_object(){
+    void cp_response_string_should_map_to_object() {
         String cpResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
         CourtResponse response = courtHouseMapper.mapStringToCourtResponse(cpResponse);
         assertThat(response.getOucode()).isEqualTo("B42CM00");
@@ -39,25 +40,72 @@ class CourtHouseMapperTest {
     void cp_response_object_should_map_to_amp_response() {
         UUID courtRoomId = UUID.fromString("3a8da3da-02b5-45f8-b81c-bda81e54f3bc");
         CourtResponse.CourtRoom courtRoom = CourtResponse.CourtRoom.builder()
-            .id(courtRoomId.toString())
-            .courtroomId("2330")
-            .courtroomName("Courtroom 01")
-            .build();
+                .id(courtRoomId.toString())
+                .courtroomId("2330")
+                .courtroomName("Courtroom 01")
+                .build();
         CourtResponse courtResponse = CourtResponse.builder()
-            .oucodeL1Name("Magistrates Courts")
-            .address1("Line1")
-            .address2("Line2")
-            .address3("Line3")
-            .address4("Line4")
-            .postcode("SW11 1JU")
-            .oucode("B01LY00")
-            .oucodeL3Name("Lavender Hill Magistrates' Court")
-            .courtrooms(List.of(courtRoom))
-            .build();
+                .oucodeL1Name("Magistrates Courts")
+                .address1("Line1")
+                .address2("Line2")
+                .address3("Line3")
+                .address4("Line4")
+                .postcode("SW11 1JU")
+                .oucode("B01LY00")
+                .oucodeL3Name("Lavender Hill Magistrates' Court")
+                .courtrooms(List.of(courtRoom))
+                .build();
 
         CourtHouseResponse response = courtHouseMapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId);
 
         assertResponse(response);
+    }
+
+    @Test
+    void cp_response_without_courtrooms_should_map_to_courtHouse_with_null_courtRoom_and_crown_type() {
+        CourtResponse courtResponse = CourtResponse.builder()
+                .oucodeL1Name("Crown Courts")
+                .address1("Line1")
+                .address2("Line2")
+                .address3("Line3")
+                .address4("Line4")
+                .postcode("SW11 1JU")
+                .oucode("B01LY00")
+                .oucodeL3Name("Crown Court")
+                .courtrooms(null)
+                .build();
+
+        CourtHouseResponse response = courtHouseMapper.mapCPResponseToCourtHouse(courtResponse);
+
+        assertThat(response.getCourtHouseType()).isEqualTo(CourtHouseResponse.CourtHouseTypeEnum.CROWN);
+        assertThat(response.getCourtRoom()).isNull();
+        assertThat(response.getAddress().getCountry()).isEqualTo("UK");
+    }
+
+    @Test
+    void cp_response_with_no_matching_courtroom_id_should_return_empty_courtRoom_list() {
+        UUID requestedId = UUID.fromString("3a8da3da-02b5-45f8-b81c-bda81e54f3bc");
+        CourtResponse.CourtRoom existing = CourtResponse.CourtRoom.builder()
+                .id(UUID.randomUUID().toString())
+                .courtroomId("2330")
+                .courtroomName("Courtroom 01")
+                .build();
+
+        CourtResponse courtResponse = CourtResponse.builder()
+                .oucodeL1Name("Magistrates Courts")
+                .address1("Line1")
+                .address2("Line2")
+                .address3("Line3")
+                .address4("Line4")
+                .postcode("SW11 1JU")
+                .oucode("B01LY00")
+                .oucodeL3Name("Lavender Hill Magistrates' Court")
+                .courtrooms(List.of(existing))
+                .build();
+
+        CourtHouseResponse response = courtHouseMapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, requestedId);
+
+        assertThat(response.getCourtRoom()).isEmpty();
     }
 
     private void assertResponse(CourtHouseResponse courtResponse) {
