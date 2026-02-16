@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +35,7 @@ class ValidationIntegrationTest {
     }
 
     @Test
-    void empty_courtId_should_throw_404() throws Exception {
+    void non_uuid_courtId_should_throw_404() throws Exception {
         String url = String.format("/courthouses/%s/courtrooms/%s", "", courtRoomId);
         mockMvc.perform(get(url))
             .andDo(print())
@@ -52,5 +51,4 @@ class ValidationIntegrationTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", containsString("No endpoint GET /courthouses/")));
     }
-
 }

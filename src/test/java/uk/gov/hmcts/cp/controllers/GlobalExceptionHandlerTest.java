@@ -13,6 +13,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
 import uk.gov.hmcts.cp.openapi.model.ErrorResponse;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +23,8 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
+    private static final String ERROR = "Error";
+    public static final String URL = "Url";
     @Spy
     Tracer tracer = Tracer.NOOP;
 
@@ -30,35 +33,35 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void error_response_should_handle_ok() {
-        ResponseStatusException e = new ResponseStatusException(INTERNAL_SERVER_ERROR, "Error");
+        ResponseStatusException e = new ResponseStatusException(INTERNAL_SERVER_ERROR, ERROR);
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleResponseStatusException(e);
-        assertErrorFields(response, INTERNAL_SERVER_ERROR, "Error");
+        assertErrorFields(response, INTERNAL_SERVER_ERROR, ERROR);
     }
 
     @Test
     void server_exception_should_handle_ok() {
-        HttpServerErrorException e = new HttpServerErrorException(INTERNAL_SERVER_ERROR, "Error");
+        HttpServerErrorException e = new HttpServerErrorException(INTERNAL_SERVER_ERROR, ERROR);
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleServerException(e);
         assertErrorFields(response, INTERNAL_SERVER_ERROR, "500 Error");
     }
 
     @Test
     void client_exception_should_handle_ok() {
-        HttpClientErrorException e = new HttpClientErrorException(NOT_FOUND, "Error");
+        HttpClientErrorException e = new HttpClientErrorException(NOT_FOUND, ERROR);
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleClientException(e);
         assertErrorFields(response, NOT_FOUND, "404 Error");
     }
 
     @Test
     void no_resource_found_exception_should_handle_ok() {
-        NoResourceFoundException e = new NoResourceFoundException(GET, "Url", "Path");
+        NoResourceFoundException e = new NoResourceFoundException(GET, URL, "Path");
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNoResourceFoundException(e);
         assertErrorFields(response, NOT_FOUND, "No static resource Path for request 'Url'.");
     }
 
     @Test
     void no_handler_found_exception_should_handle_ok() {
-        NoHandlerFoundException e = new NoHandlerFoundException("GET", "Url", null);
+        NoHandlerFoundException e = new NoHandlerFoundException("GET", URL, null);
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNoHandlerFoundException(e);
         assertErrorFields(response, NOT_FOUND, "No endpoint GET Url.");
     }

@@ -26,6 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Slf4j
 public class TracingIntegrationTest {
 
+    public static final String TRACE_ID = "traceId";
+    public static final String SPAN_ID = "spanId";
+
     @Value("${spring.application.name}")
     private String springApplicationName;
 
@@ -50,8 +53,8 @@ public class TracingIntegrationTest {
         assertThat(loggedMessage).isNotEmpty();
         Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
         });
-        assertThat(capturedFields.get("traceId")).isNotNull();
-        assertThat(capturedFields.get("spanId")).isNotNull();
+        assertThat(capturedFields.get(TRACE_ID)).isNotNull();
+        assertThat(capturedFields.get(SPAN_ID)).isNotNull();
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.controllers.RootController");
         assertThat(capturedFields.get("message")).isEqualTo("START\n");
     }
@@ -60,8 +63,8 @@ public class TracingIntegrationTest {
     void incoming_request_with_traceId_should_pass_through() throws Exception {
         ByteArrayOutputStream capturedStdOut = captureStdOut();
         MvcResult result = mockMvc.perform(get("/")
-                        .header("traceId", "1234-1234")
-                        .header("spanId", "567-567"))
+                        .header(TRACE_ID, "1234-1234")
+                        .header(SPAN_ID, "567-567"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -70,12 +73,12 @@ public class TracingIntegrationTest {
         assertThat(loggedMessage).isNotEmpty();
         Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
         });
-        assertThat(capturedFields.get("traceId")).isEqualTo("1234-1234");
-        assertThat(capturedFields.get("spanId")).isEqualTo("567-567");
+        assertThat(capturedFields.get(TRACE_ID)).isEqualTo("1234-1234");
+        assertThat(capturedFields.get(SPAN_ID)).isEqualTo("567-567");
         assertThat(capturedFields.get("applicationName")).isEqualTo(springApplicationName);
 
-        assertThat(result.getResponse().getHeader("traceId")).isEqualTo(capturedFields.get("traceId"));
-        assertThat(result.getResponse().getHeader("spanId")).isEqualTo(capturedFields.get("spanId"));
+        assertThat(result.getResponse().getHeader(TRACE_ID)).isEqualTo(capturedFields.get(TRACE_ID));
+        assertThat(result.getResponse().getHeader(SPAN_ID)).isEqualTo(capturedFields.get(SPAN_ID));
     }
 
     private ByteArrayOutputStream captureStdOut() {
