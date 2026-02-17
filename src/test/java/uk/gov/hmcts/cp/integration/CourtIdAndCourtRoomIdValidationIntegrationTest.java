@@ -49,15 +49,28 @@ class CourtIdAndCourtRoomIdValidationIntegrationTest {
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.message", containsString("Method parameter 'court_id': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'")));
+            .andExpect(jsonPath("$.message",
+                                containsString(
+                                    "Method parameter 'court_id': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'")
+            ));
     }
 
     @Test
-    void empty_courtRoom_should_throw_404() throws Exception {
+    void empty_courtRoomId_should_throw_404() throws Exception {
         String url = String.format("/courthouses/%s/courtrooms/%s", courtId, "");
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", containsString("No endpoint GET /courthouses/")));
+    }
+
+    @Test
+    void non_uuid_courtRoomId_should_throw_400() throws Exception {
+        String url = String.format("/courthouses/%s/courtrooms/%s", courtId, "not-a-uuid");
+        String expectedError = "Method parameter 'court_room_id': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'";
+        mockMvc.perform(get(url))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", containsString(expectedError)));
     }
 }
