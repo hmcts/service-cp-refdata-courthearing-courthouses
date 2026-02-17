@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Slf4j
-class ValidationIntegrationTest {
+class CourtIdAndCourtRoomIdValidationIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,12 +35,21 @@ class ValidationIntegrationTest {
     }
 
     @Test
-    void non_uuid_courtId_should_throw_404() throws Exception {
+    void empty_courtId_should_throw_404() throws Exception {
         String url = String.format("/courthouses/%s/courtrooms/%s", "", courtRoomId);
         mockMvc.perform(get(url))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message", containsString("No endpoint GET /courthouses/")));
+    }
+
+    @Test
+    void non_uuid_courtId_should_throw_400() throws Exception {
+        String url = String.format("/courthouses/%s/courtrooms/%s", "not-a-uuid", courtRoomId);
+        mockMvc.perform(get(url))
+            .andDo(print())
+            .andExpect(status().isBadRequest())
+            .andExpect(jsonPath("$.message", containsString("Method parameter 'court_id': Failed to convert value of type 'java.lang.String' to required type 'java.util.UUID'")));
     }
 
     @Test

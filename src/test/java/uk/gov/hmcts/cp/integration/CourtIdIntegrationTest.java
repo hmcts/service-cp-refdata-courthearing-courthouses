@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CourtHousesControllerIntegrationTest {
+class CourtIdIntegrationTest {
 
     @Autowired
     AppPropertiesBackend appProperties;
@@ -43,33 +43,17 @@ class CourtHousesControllerIntegrationTest {
     RestTemplate restTemplate;
 
     UUID courtId = UUID.randomUUID();
-    UUID courtRoomId = UUID.fromString("a102458c-301f-3fe5-88d0-5cda9455f235");
-    String url = String.format("/courthouses/%s/courtrooms/%s", courtId, courtRoomId);
-    String courthouseOnlyUrl = String.format("/courthouses/%s", courtId);
+    String courtIdUrl = String.format("/courthouses/%s", courtId);
 
     @Test
     void get_courthouse_by_court_id_should_return_ok() throws Exception {
         String jsonResponse = Files.readString(Path.of("src/test/resources/courtHouseResponse.json"));
         mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
-        mockMvc.perform(get(courthouseOnlyUrl))
+        mockMvc.perform(get(courtIdUrl))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
             .andExpect(jsonPath("$.courtRoom").doesNotExist());
-    }
-
-    @Test
-    void get_courthouses_should_return_ok() throws Exception {
-        String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
-        mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
-        mockMvc.perform(get(url))
-            .andDo(print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
-            .andExpect(jsonPath("$.courtRoom").exists())
-            .andExpect(jsonPath("$.courtRoom").value(hasSize(1)))
-            .andExpect(jsonPath("$.courtRoom[0].courtRoomId").value(644))
-            .andExpect(jsonPath("$.courtRoom[0].courtRoomName").value("Courtroom 01"));
     }
 
     @Test
@@ -82,7 +66,7 @@ class CourtHousesControllerIntegrationTest {
             eq(String.class)
         )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(courtIdUrl))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
@@ -91,7 +75,7 @@ class CourtHousesControllerIntegrationTest {
     @Test
     void not_exist_empty_should_throw_404() throws Exception {
         mockRestResponse(HttpStatus.OK, "{}", courtId);
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(courtIdUrl))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
@@ -105,7 +89,7 @@ class CourtHousesControllerIntegrationTest {
             eq(client.getRequestEntity()),
             eq(String.class)
         )).thenThrow(new RuntimeException("SSL certificate problem: unable to get local issuer certificate"));
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(courtIdUrl))
             .andDo(print())
             .andExpect(status().is5xxServerError())
             .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));

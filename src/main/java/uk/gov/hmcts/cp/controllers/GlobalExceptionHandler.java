@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -40,6 +41,14 @@ public class GlobalExceptionHandler {
         log.error("GlobalExceptionHandler handleServerException", e);
         return ResponseEntity
             .status(e.getStatusCode())
+            .body(buildErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatch(final MethodArgumentTypeMismatchException e) {
+        log.error("MethodArgumentTypeMismatchException handleClientException", e);
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
             .body(buildErrorResponse(e.getMessage()));
     }
 
