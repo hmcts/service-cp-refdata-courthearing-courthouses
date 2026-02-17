@@ -35,8 +35,33 @@ class GlobalExceptionHandlerTest {
     @InjectMocks
     GlobalExceptionHandler globalExceptionHandler;
 
-    @Mock
-    MethodArgumentTypeMismatchException mismatchException;
+    @Test
+    void no_resource_found_exception_should_handle_ok() {
+        NoResourceFoundException e = new NoResourceFoundException(GET, URL, "Path");
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNotFoundException(e);
+        assertErrorFields(response, NOT_FOUND, "No static resource Path for request 'Url'.");
+    }
+
+    @Test
+    void no_handler_found_exception_should_handle_ok() {
+        NoHandlerFoundException e = new NoHandlerFoundException("GET", URL, null);
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNotFoundException(e);
+        assertErrorFields(response, NOT_FOUND, "No endpoint GET Url.");
+    }
+
+    @Test
+    void bad_request_should_handle_ok() {
+        Exception e = new Exception("Bad request of some kind");
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleBadRequestException(e);
+        assertErrorFields(response, BAD_REQUEST, "Bad request of some kind");
+    }
+
+    @Test
+    void client_exception_should_handle_ok() {
+        HttpClientErrorException e = new HttpClientErrorException(BAD_REQUEST, ERROR);
+        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleClientException(e);
+        assertErrorFields(response, BAD_REQUEST, "400 Error");
+    }
 
     @Test
     void error_response_should_handle_ok() {
@@ -50,34 +75,6 @@ class GlobalExceptionHandlerTest {
         HttpServerErrorException e = new HttpServerErrorException(INTERNAL_SERVER_ERROR, ERROR);
         ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleServerException(e);
         assertErrorFields(response, INTERNAL_SERVER_ERROR, "500 Error");
-    }
-
-    @Test
-    void client_exception_should_handle_ok() {
-        HttpClientErrorException e = new HttpClientErrorException(BAD_REQUEST, ERROR);
-        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleClientException(e);
-        assertErrorFields(response, BAD_REQUEST, "400 Error");
-    }
-
-    @Test
-    void bad_request_should_handle_ok() {
-        when(mismatchException.getMessage()).thenReturn("Bad request data type");
-        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleMethodArgumentTypeMismatch(mismatchException);
-        assertErrorFields(response, BAD_REQUEST, "Bad request data type");
-    }
-
-    @Test
-    void no_resource_found_exception_should_handle_ok() {
-        NoResourceFoundException e = new NoResourceFoundException(GET, URL, "Path");
-        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNoResourceFoundException(e);
-        assertErrorFields(response, NOT_FOUND, "No static resource Path for request 'Url'.");
-    }
-
-    @Test
-    void no_handler_found_exception_should_handle_ok() {
-        NoHandlerFoundException e = new NoHandlerFoundException("GET", URL, null);
-        ResponseEntity<ErrorResponse> response = globalExceptionHandler.handleNoHandlerFoundException(e);
-        assertErrorFields(response, NOT_FOUND, "No endpoint GET Url.");
     }
 
     @Test
