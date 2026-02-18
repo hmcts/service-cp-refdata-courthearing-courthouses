@@ -1,14 +1,18 @@
 package uk.gov.hmcts.cp.controllers;
 
 import io.micrometer.tracing.Tracer;
+import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -24,6 +28,26 @@ public class GlobalExceptionHandler {
 
     private final Tracer tracer;
 
+    @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+    public ResponseEntity<ErrorResponse> handleNotFoundException(final Exception e) {
+        log.error("GlobalExceptionHandler handleNoResourceFoundException");
+        return ResponseEntity
+            .status(HttpStatus.NOT_FOUND)
+            .body(buildErrorResponse(e.getMessage()));
+    }
+
+    @ExceptionHandler({
+        ConstraintViolationException.class,
+        MethodArgumentTypeMismatchException.class,
+        MethodArgumentNotValidException.class,
+        HttpMessageNotReadableException.class})
+    public ResponseEntity<ErrorResponse> handleBadRequestException(final Exception exception) {
+        log.error("Validation failed: {}", exception.getMessage());
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(buildErrorResponse(exception.getMessage()));
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatusException(final ResponseStatusException responseStatusException) {
         log.error("GlobalExceptionHandler handleResponseStatusException", responseStatusException);
@@ -35,14 +59,6 @@ public class GlobalExceptionHandler {
             .body(buildErrorResponse(errorMessage));
     }
 
-    @ExceptionHandler(HttpServerErrorException.class)
-    public ResponseEntity<ErrorResponse> handleServerException(final HttpServerErrorException e) {
-        log.error("GlobalExceptionHandler handleServerException", e);
-        return ResponseEntity
-            .status(e.getStatusCode())
-            .body(buildErrorResponse(e.getMessage()));
-    }
-
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<ErrorResponse> handleClientException(final HttpClientErrorException e) {
         log.error("GlobalExceptionHandler handleClientException", e);
@@ -51,19 +67,11 @@ public class GlobalExceptionHandler {
             .body(buildErrorResponse(e.getMessage()));
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoResourceFoundException(final NoResourceFoundException e) {
-        log.error("GlobalExceptionHandler handleNoResourceFoundException");
+    @ExceptionHandler(HttpServerErrorException.class)
+    public ResponseEntity<ErrorResponse> handleServerException(final HttpServerErrorException e) {
+        log.error("GlobalExceptionHandler handleServerException", e);
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(buildErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(final NoHandlerFoundException e) {
-        log.error("GlobalExceptionHandler handleNoHandlerFoundException");
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
+            .status(e.getStatusCode())
             .body(buildErrorResponse(e.getMessage()));
     }
 
