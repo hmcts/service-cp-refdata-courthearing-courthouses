@@ -312,6 +312,10 @@ jobs:
               echo "stack=prdamp01" >> $GITHUB_OUTPUT
               echo "cluster=K8-PRD-CS01-CL02" >> $GITHUB_OUTPUT
               ;;
+            *)
+              echo "Error: invalid deploy_environment value '${{ inputs.deploy_environment }}'. Expected one of: dev, sit, prp, prd." >&2
+              exit 1
+              ;;
           esac
 
       - name: Trigger K8s deployment
