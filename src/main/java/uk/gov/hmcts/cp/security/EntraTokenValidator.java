@@ -18,7 +18,6 @@ import uk.gov.hmcts.cp.config.AuthProperties;
 import java.text.ParseException;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -129,17 +128,17 @@ public class EntraTokenValidator {
     }
 
     private void verifyValidityWindow(final JWTClaimsSet claims) throws TokenValidationException {
-        final Date expiry = claims.getExpirationTime();
-        if (expiry == null) {
+        // Nimbus exposes exp/nbf as java.util.Date; convert at the call so no Date-typed local exists.
+        if (claims.getExpirationTime() == null) {
             throw new TokenValidationException(TokenRejectionReason.MISSING_EXPIRY);
         }
         final Instant now = Instant.now();
         final Duration skew = Duration.ofSeconds(authProperties.getClockSkewSeconds());
-        if (expiry.toInstant().isBefore(now.minus(skew))) {
+        if (claims.getExpirationTime().toInstant().isBefore(now.minus(skew))) {
             throw new TokenValidationException(TokenRejectionReason.EXPIRED);
         }
-        final Date notBefore = claims.getNotBeforeTime();
-        if (notBefore != null && notBefore.toInstant().isAfter(now.plus(skew))) {
+        if (claims.getNotBeforeTime() != null
+            && claims.getNotBeforeTime().toInstant().isAfter(now.plus(skew))) {
             throw new TokenValidationException(TokenRejectionReason.NOT_YET_VALID);
         }
     }
