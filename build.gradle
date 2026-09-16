@@ -75,9 +75,13 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
   implementation 'org.hibernate.validator:hibernate-validator'
   implementation 'org.springframework.boot:spring-boot-starter-opentelemetry'
-  implementation 'io.jsonwebtoken:jjwt:0.13.0'
   implementation 'org.apache.commons:commons-text:1.15.0'
+  // Scrapeable registry for the /prometheus endpoint already in the actuator exposure list
+  implementation 'io.micrometer:micrometer-registry-prometheus'
   testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+  // Entra access token validation
+  implementation 'com.nimbusds:nimbus-jose-jwt:10.5'
 
   // Should come in with the api
   implementation 'io.swagger.core.v3:swagger-core:2.2.50'

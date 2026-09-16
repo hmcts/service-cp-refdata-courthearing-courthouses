@@ -2,17 +2,13 @@ package uk.gov.hmcts.cp.integration;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.cp.clients.CourtHousesClient;
-import uk.gov.hmcts.cp.config.AppPropertiesBackend;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,18 +22,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.cp.security.TestTokens.validBearer;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-class CourtIdAndCourtRoomIdIntegrationTest {
+class CourtIdAndCourtRoomIdIntegrationTest extends IntegrationTestBase {
 
-    @Autowired
-    AppPropertiesBackend appProperties;
     @Autowired
     CourtHousesClient client;
-
-    @Autowired
-    private MockMvc mockMvc;
 
     @MockitoBean
     RestTemplate restTemplate;
@@ -50,7 +41,7 @@ class CourtIdAndCourtRoomIdIntegrationTest {
     void get_courthouse_by_court_id_and_court_room_id_should_return_ok() throws Exception {
         String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
         mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).header(AUTHORIZATION, validBearer()))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
@@ -62,7 +53,7 @@ class CourtIdAndCourtRoomIdIntegrationTest {
     void get_courthouses_should_return_ok() throws Exception {
         String jsonResponse = Files.readString(Path.of("src/test/resources/courtRoomResponse.json"));
         mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).header(AUTHORIZATION, validBearer()))
             .andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
@@ -82,7 +73,7 @@ class CourtIdAndCourtRoomIdIntegrationTest {
             eq(String.class)
         )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
 
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).header(AUTHORIZATION, validBearer()))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
@@ -91,7 +82,7 @@ class CourtIdAndCourtRoomIdIntegrationTest {
     @Test
     void not_exist_empty_should_throw_404() throws Exception {
         mockRestResponse(HttpStatus.OK, "{}", courtId);
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).header(AUTHORIZATION, validBearer()))
             .andDo(print())
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
@@ -105,7 +96,7 @@ class CourtIdAndCourtRoomIdIntegrationTest {
             eq(client.getRequestEntity()),
             eq(String.class)
         )).thenThrow(new RuntimeException("SSL certificate problem: unable to get local issuer certificate"));
-        mockMvc.perform(get(url))
+        mockMvc.perform(get(url).header(AUTHORIZATION, validBearer()))
             .andDo(print())
             .andExpect(status().is5xxServerError())
             .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));
