@@ -34,9 +34,9 @@ class CourtHousesServiceTest {
     @Test
     void service_should_call_client() {
         when(courtHousesClient.getCourtHouse(courtId)).thenReturn(courtResponse);
-        when(mapper.mapCommonPlatformResponse(courtResponse, courtRoomId)).thenReturn(courtHouseResponse);
+        when(mapper.mapCourtHouseCPResponseWithCourtRoomId(courtResponse, courtRoomId)).thenReturn(courtHouseResponse);
 
-        CourtHouseResponse response = courtHousesService.getCourtHouse(courtId, courtRoomId);
+        CourtHouseResponse response = courtHousesService.getCourthouseByCourtIdAndCourtRoomId(courtId, courtRoomId);
 
         assertThat(response).isEqualTo(courtHouseResponse);
     }

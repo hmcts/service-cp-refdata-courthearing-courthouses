@@ -17,6 +17,7 @@ jobs:
       actions: read
       contents: read
       security-events: write
+      pull-requests: write
 
     strategy:
       fail-fast: false
@@ -35,6 +36,7 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           queries: security-extended
+
 
       - uses: actions/setup-java@v5
         with:

@@ -2,13 +2,16 @@ package uk.gov.hmcts.cp.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.cp.security.TestJwksConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -21,16 +24,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// Captures System.out and asserts on the exact log lines one request emits, so it needs a
+// context of its own - the marker property below keeps it out of the shared one.
+@SpringBootTest(properties = {
+    "auth.mode=ENFORCE",
+    "auth.tenant-id=11111111-1111-1111-1111-111111111111",
+    "auth.audience=22222222-2222-2222-2222-222222222222",
+    "auth.roles=CourtHouses.Read.All",
+    "test.stdout-capture=tracing"
+})
 @AutoConfigureMockMvc
-@SpringBootTest(properties = {"jwt.filter.enabled=false"})
+@ActiveProfiles("test")
+@Import(TestJwksConfig.class)
 @Slf4j
 public class TracingIntegrationTest {
 
+    public static final String TRACE_ID = "traceId";
+    public static final String SPAN_ID = "spanId";
+
+    @Autowired
+    private MockMvc mockMvc;
+
     @Value("${spring.application.name}")
     private String springApplicationName;
-
-    @Resource
-    private MockMvc mockMvc;
 
     private PrintStream originalStdOut = System.out;
 
@@ -50,8 +66,8 @@ public class TracingIntegrationTest {
         assertThat(loggedMessage).isNotEmpty();
         Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
         });
-        assertThat(capturedFields.get("traceId")).isNotNull();
-        assertThat(capturedFields.get("spanId")).isNotNull();
+        assertThat(capturedFields.get(TRACE_ID)).isNotNull();
+        assertThat(capturedFields.get(SPAN_ID)).isNotNull();
         assertThat(capturedFields.get("logger_name")).isEqualTo("uk.gov.hmcts.cp.controllers.RootController");
         assertThat(capturedFields.get("message")).isEqualTo("START\n");
     }
@@ -60,8 +76,8 @@ public class TracingIntegrationTest {
     void incoming_request_with_traceId_should_pass_through() throws Exception {
         ByteArrayOutputStream capturedStdOut = captureStdOut();
         MvcResult result = mockMvc.perform(get("/")
-                        .header("traceId", "1234-1234")
-                        .header("spanId", "567-567"))
+                        .header(TRACE_ID, "1234-1234")
+                        .header(SPAN_ID, "567-567"))
                 .andExpect(status().isOk())
                 .andDo(print())
                 .andReturn();
@@ -70,12 +86,12 @@ public class TracingIntegrationTest {
         assertThat(loggedMessage).isNotEmpty();
         Map<String, Object> capturedFields = new ObjectMapper().readValue(loggedMessage, new TypeReference<>() {
         });
-        assertThat(capturedFields.get("traceId")).isEqualTo("1234-1234");
-        assertThat(capturedFields.get("spanId")).isEqualTo("567-567");
+        assertThat(capturedFields.get(TRACE_ID)).isEqualTo("1234-1234");
+        assertThat(capturedFields.get(SPAN_ID)).isEqualTo("567-567");
         assertThat(capturedFields.get("applicationName")).isEqualTo(springApplicationName);
 
-        assertThat(result.getResponse().getHeader("traceId")).isEqualTo(capturedFields.get("traceId"));
-        assertThat(result.getResponse().getHeader("spanId")).isEqualTo(capturedFields.get("spanId"));
+        assertThat(result.getResponse().getHeader(TRACE_ID)).isEqualTo(capturedFields.get(TRACE_ID));
+        assertThat(result.getResponse().getHeader(SPAN_ID)).isEqualTo(capturedFields.get(SPAN_ID));
     }
 
     private ByteArrayOutputStream captureStdOut() {

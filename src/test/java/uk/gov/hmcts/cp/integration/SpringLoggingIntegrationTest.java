@@ -4,19 +4,34 @@ import ch.qos.logback.classic.AsyncAppender;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.cp.security.TestJwksConfig;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Map;
 
-@SpringBootTest
+// Captures System.out and asserts on the exact log lines one request emits, so it needs a
+// context of its own - the marker property below keeps it out of the shared one.
+@SpringBootTest(properties = {
+    "auth.mode=ENFORCE",
+    "auth.tenant-id=11111111-1111-1111-1111-111111111111",
+    "auth.audience=22222222-2222-2222-2222-222222222222",
+    "auth.roles=CourtHouses.Read.All",
+    "test.stdout-capture=logging"
+})
+@AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Import(TestJwksConfig.class)
 @Slf4j
 public class SpringLoggingIntegrationTest {
 

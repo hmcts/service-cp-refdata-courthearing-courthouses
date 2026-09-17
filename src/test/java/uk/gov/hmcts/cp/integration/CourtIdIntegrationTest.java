@@ -1,0 +1,107 @@
+package uk.gov.hmcts.cp.integration;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.cp.clients.CourtHousesClient;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static uk.gov.hmcts.cp.security.TestTokens.validBearer;
+
+class CourtIdIntegrationTest extends IntegrationTestBase {
+
+    @Autowired
+    CourtHousesClient client;
+
+    @MockitoBean
+    RestTemplate restTemplate;
+
+    UUID courtId = UUID.randomUUID();
+    String courtIdUrl = String.format("/courthouses/%s", courtId);
+
+    @Test
+    void get_courthouse_by_court_id_should_return_ok() throws Exception {
+        String jsonResponse = Files.readString(Path.of("src/test/resources/courtHouseResponse.json"));
+        mockRestResponse(HttpStatus.OK, jsonResponse, courtId);
+        mockMvc.perform(get(courtIdUrl).header(AUTHORIZATION, validBearer()))
+            .andDo(print())
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.courtHouseType").value("magistrate"))
+            .andExpect(jsonPath("$.courtRoom").doesNotExist());
+    }
+
+    @Test
+    void not_exist_thrown_should_throw_404() throws Exception {
+        String expectedUrl = expectedUrl(courtId);
+        when(restTemplate.exchange(
+            eq(expectedUrl),
+            eq(HttpMethod.GET),
+            eq(client.getRequestEntity()),
+            eq(String.class)
+        )).thenThrow(new HttpClientErrorException(HttpStatus.NOT_FOUND));
+
+        mockMvc.perform(get(courtIdUrl).header(AUTHORIZATION, validBearer()))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
+    }
+
+    @Test
+    void not_exist_empty_should_throw_404() throws Exception {
+        mockRestResponse(HttpStatus.OK, "{}", courtId);
+        mockMvc.perform(get(courtIdUrl).header(AUTHORIZATION, validBearer()))
+            .andDo(print())
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.message").value("404 NOT_FOUND"));
+    }
+
+    @Test
+    void certificate_error_should_return_500() throws Exception {
+        when(restTemplate.exchange(
+            anyString(),
+            eq(HttpMethod.GET),
+            eq(client.getRequestEntity()),
+            eq(String.class)
+        )).thenThrow(new RuntimeException("SSL certificate problem: unable to get local issuer certificate"));
+        mockMvc.perform(get(courtIdUrl).header(AUTHORIZATION, validBearer()))
+            .andDo(print())
+            .andExpect(status().is5xxServerError())
+            .andExpect(jsonPath("$.message").value("SSL certificate problem: unable to get local issuer certificate"));
+    }
+
+    private void mockRestResponse(HttpStatus httpStatus, String courtResponse, UUID courtRoomId) {
+        String expectedUrl = expectedUrl(courtRoomId);
+        when(restTemplate.exchange(
+            eq(expectedUrl),
+            eq(HttpMethod.GET),
+            eq(client.getRequestEntity()),
+            eq(String.class)
+        )).thenReturn(new ResponseEntity<>(courtResponse, httpStatus));
+    }
+
+    private String expectedUrl(UUID courtRoomId) {
+        return String.format(
+            "%s%s/%s",
+            appProperties.getBackendUrl(),
+            appProperties.getBackendPath(),
+            courtRoomId
+        );
+    }
+}
