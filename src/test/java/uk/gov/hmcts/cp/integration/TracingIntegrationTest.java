@@ -2,13 +2,16 @@ package uk.gov.hmcts.cp.integration;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+import uk.gov.hmcts.cp.security.TestJwksConfig;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
@@ -21,19 +24,29 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+// Captures System.out and asserts on the exact log lines one request emits, so it needs a
+// context of its own - the marker property below keeps it out of the shared one.
+@SpringBootTest(properties = {
+    "auth.mode=ENFORCE",
+    "auth.tenant-id=11111111-1111-1111-1111-111111111111",
+    "auth.audience=22222222-2222-2222-2222-222222222222",
+    "auth.roles=CourtHouses.Read.All",
+    "test.stdout-capture=tracing"
+})
 @AutoConfigureMockMvc
-@SpringBootTest(properties = {"jwt.filter.enabled=false"})
+@ActiveProfiles("test")
+@Import(TestJwksConfig.class)
 @Slf4j
 public class TracingIntegrationTest {
 
     public static final String TRACE_ID = "traceId";
     public static final String SPAN_ID = "spanId";
 
+    @Autowired
+    private MockMvc mockMvc;
+
     @Value("${spring.application.name}")
     private String springApplicationName;
-
-    @Resource
-    private MockMvc mockMvc;
 
     private PrintStream originalStdOut = System.out;
 
