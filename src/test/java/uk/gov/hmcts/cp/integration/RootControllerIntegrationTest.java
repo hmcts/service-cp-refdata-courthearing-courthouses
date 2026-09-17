@@ -2,13 +2,7 @@ package uk.gov.hmcts.cp.integration;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -19,17 +13,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
-@AutoConfigureMockMvc
 @TestPropertySource(properties = {
     "service.court-house-client.url=https://CAOURT_HOUSE.org.uk",
     "service.court-house-client.cjscppuid=MOCK-CJSCPPUID"
 })
-class RootControllerIntegrationTest {
-
-    @Autowired
-    private MockMvc mockMvc;
+class RootControllerIntegrationTest extends IntegrationTestBase {
 
     @DisplayName("Should welcome upon root request with 200 response code")
     @Test
