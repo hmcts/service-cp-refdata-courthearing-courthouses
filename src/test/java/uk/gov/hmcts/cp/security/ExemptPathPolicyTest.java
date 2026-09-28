@@ -32,11 +32,19 @@ class ExemptPathPolicyTest {
     }
 
     @Test
+    @DisplayName("A trailing slash on an exempt path is still exempt")
+    void exempts_exempt_paths_with_a_trailing_slash() {
+        assertThat(policy.isExempt("/health/")).isTrue();
+        assertThat(policy.isExempt("/health/liveness/")).isTrue();
+        assertThat(policy.isExempt("/health/readiness/")).isTrue();
+        assertThat(policy.isExempt("/health//")).isFalse();
+    }
+
+    @Test
     @DisplayName("Near-miss paths are not exempt")
     void does_not_exempt_near_miss_paths() {
         assertThat(policy.isExempt("/healthx")).isFalse();
         assertThat(policy.isExempt("/health/x")).isFalse();
-        assertThat(policy.isExempt("/health/")).isFalse();
         assertThat(policy.isExempt("/HEALTH")).isFalse();
         assertThat(policy.isExempt("/prometheus/metrics")).isFalse();
         assertThat(policy.isExempt("/courthouses")).isFalse();
