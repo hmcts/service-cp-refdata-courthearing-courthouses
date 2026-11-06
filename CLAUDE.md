@@ -23,8 +23,8 @@ uk.gov.hmcts.cp/
   config/
     AppConfig                               @Bean RestTemplate
     AppPropertiesBackend                    @Value CP_BACKEND_URL
-    AuthProperties                          @Value auth.*; fails startup on incomplete/non-enforcing config
-    EntraAuthConfig                         @Bean cached, rate-limited JWKSource
+    AuthProperties                          @Value auth.*; trusted issuers (primary + optional CP); fails startup on incomplete/non-enforcing config
+    EntraAuthConfig                         @Bean JwkSourceFactory: cached, rate-limited JWKS per issuer
   controllers/
     CourtHousesController                   Handles GET /courthouses/{court_id}
     CourtRoomsController                    Handles GET /courthouses/{court_id}/courtrooms/{court_room_id}
@@ -38,11 +38,12 @@ uk.gov.hmcts.cp/
   mappers/
     CourtHouseMapper                        Maps CourtResponse domain DTO to API response models
   security/
-    EntraTokenValidator                     RS256-pinned signature + claims validation
+    EntraTokenValidator                     iss selects the trusted issuer; RS256-pinned signature + claims validation
+    TrustedIssuer, JwkSourceFactory         One issuer's tenant/audiences/JWKS; per-issuer key source
     ExemptPathPolicy                        Exact-match exemption list for infrastructure paths
     AuthMode / TokenRejectionReason         Rollout mode; coarse rejection reasons mapped to 401/403
     TokenValidationException                Checked; carries a reason, never token material
-    CallerIdentity                          azp-derived caller, plus a verified flag
+    CallerIdentity                          azp-derived caller, verified flag and issuer name
   services/
     CourtHousesService                      Calls CourtHousesClient for both house and room endpoints
 ```
@@ -55,8 +56,10 @@ uk.gov.hmcts.cp/
 | `CJSCPPUID` | User UUID header on all backend calls | `00000000-0000-0000-0000-000000000000` |
 | `rpe.AppInsightsInstrumentationKey` | Azure Application Insights key | `00000000-0000-0000-0000-000000000000` |
 | `AUTH_MODE` | `OFF`/`OBSERVE`/`ENFORCE`; non-enforcing fails startup outside `local`/`test` | `ENFORCE` |
-| `AUTH_TENANT_ID` | Token-issuing Entra tenant | _(none - startup fails)_ |
-| `AUTH_AUDIENCE` | This API's own audience | _(none - startup fails)_ |
+| `AUTH_TENANT_ID` | Primary token-issuing Entra tenant | _(none - startup fails)_ |
+| `AUTH_AUDIENCE` | This API's own audience in the primary tenant | _(none - startup fails)_ |
+| `AUTH_CP_TENANT_ID` | CP issuing tenant; set with `AUTH_CP_AUDIENCE` or not at all | _(none - CP tokens rejected)_ |
+| `AUTH_CP_AUDIENCE` | This API's own audience in the CP tenant | _(none - CP tokens rejected)_ |
 | `AUTH_ROLES` | Comma-separated app roles accepted | _(none - startup fails)_ |
 | `AUTH_CLOCK_SKEW_SECONDS` | Skew for `exp`/`nbf`, capped at 300 | `60` |
 | `AUTH_JWKS_CACHE_TTL_SECONDS` | JWKS cache lifetime | `3600` |
